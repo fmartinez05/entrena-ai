@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrena.ai - Tu Entrenador Personal IA Gratuito</title>
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fbbf24'%3E%3Cpath d='M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z'/%3E%3C/svg%3E">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #e2e8f0;
+            background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-primary {
+            background-color: #fbbf24;
+            color: #1e3a8a;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #f59e0b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+        .feature-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #3b82f6;
+        }
+        #app-view-wrapper {
+            padding: 4rem 1rem 1rem 1rem;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            min-height: calc(100vh - 80px);
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fbbf24;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #1e3a8a;
+        }
+        .slider-thumb::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fbbf24;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #1e3a8a;
+        }
+        .calendar-day.selected {
+            background-color: #fbbf24;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-left-color: #fbbf24;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .view {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .view.hidden, .hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="selection:bg-amber-300 selection:text-blue-900">
+
+    <nav class="navbar p-4 flex justify-between items-center fixed top-0 left-0 w-full z-50 h-[80px]">
+        <a href="#" id="home-logo-btn" class="flex items-center gap-3 cursor-pointer">
+            <svg class="w-8 h-8 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z"/>
+            </svg>
+            <span class="text-2xl font-bold text-white">entrena.ai</span>
+        </a>
+
+        <!-- Botones de navegación para la página de inicio -->
+        <div id="landing-nav-buttons" class="flex items-center gap-4">
+            <button id="start-now-btn-nav" class="btn-primary px-5 py-2 rounded-lg font-semibold">Comenzar ahora</button>
+        </div>
+
+        <!-- Botones de navegación para la aplicación -->
+        <div id="app-nav-buttons" class="hidden items-center gap-4">
+             <div id="language-selector-container">
+                <select id="language-selector" class="bg-blue-900/50 border border-blue-700 rounded-lg px-3 py-1 text-sm text-white">
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-[80px]">
+
+        <!-- Vista de la página de inicio -->
+        <div id="landing-view">
+            <div class="flex-grow flex flex-col items-center justify-center pt-16 pb-16 px-4">
+                <section class="text-center mb-16 max-w-4xl">
+                    <div class="flex justify-center items-center gap-4 mb-4">
+                        <h1 class="text-5xl md:text-6xl font-extrabold leading-tight text-white">
+                            Entrenador Personal IA
+                        </h1>
+                        <span class="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">100% GRATIS</span>
+                    </div>
+                    <h2 class="text-5xl md:text-6xl font-extrabold leading-tight text-amber-300 mb-6">
+                        Tu Éxito, Nuestra Inteligencia.
+                    </h2>
+                    <p class="text-xl md:text-2xl text-blue-200 mb-10 max-w-3xl mx-auto">
+                        Desbloquea tu máximo potencial con planes de entrenamiento inteligentes y personalizados por IA. Sin coste, sin registros.
+                    </p>
+                    <button id="cta-start-app" class="btn-primary px-8 py-4 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl">
+                        Comenzar Ahora
+                    </button>
+                </section>
+
+                <section class="w-full max-w-6xl mb-20 px-4">
+                    <h2 class="text-4xl font-bold text-center text-white mb-12">¿Por qué Entrena.ai? Nuestras <span class="text-blue-300">Ventajas Clave</span></h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Planes Personalizados</h3>
+                            <p class="text-blue-100">Adaptamos cada entrenamiento a tu nivel, objetivos y progreso, como un entrenador real.</p>
+                        </div>
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Inteligencia Artificial</h3>
+                            <p class="text-blue-100">Nuestra IA aprende de ti, ajustando dinámicamente tu plan para maximizar resultados.</p>
+                        </div>
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Flexibilidad Total</h3>
+                            <p class="text-blue-100">Modifica tus sesiones diarias según tu fatiga y disponibilidad, sin comprometer tu objetivo.</p>
+                        </div>
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Diversidad de Disciplinas</h3>
+                            <p class="text-blue-100">Desde maratones a triatlones de larga distancia, cubrimos todas tus ambiciones.</p>
+                        </div>
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Seguimiento Detallado</h3>
+                            <p class="text-blue-100">Monitoriza tu rendimiento y ve tu evolución con gráficos y estadísticas claras.</p>
+                        </div>
+                        <div class="feature-item p-6 rounded-lg shadow-lg">
+                            <h3 class="text-2xl font-semibold text-amber-300 mb-3">Acceso Inmediato y Gratis</h3>
+                            <p class="text-blue-100">Empieza a entrenar en segundos. Sin barreras, sin costes, para siempre.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <footer class="w-full text-center py-6 text-blue-300/50 text-sm">
+                    <p>&copy; 2025 Entrena.ai - Todos los derechos reservados.</p>
+                </footer>
+            </div>
+        </div>
+
+        <!-- Contenedor principal de la aplicación -->
+        <div id="app-view-wrapper" class="hidden">
+            <div class="w-full max-w-4xl mx-auto">
+
+                <div id="main-menu" class="text-center view">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <svg id="logo" class="w-10 h-10 md:w-12 md:h-12 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z"/>
+                        </svg>
+                        <h1 id="app-title" class="text-4xl md:text-5xl font-bold">Entrenador Personal IA</h1>
+                    </div>
+
+                    <p id="app-subtitle" class="text-lg text-blue-200 mb-8 max-w-2xl mx-auto">Tu compañero inteligente para alcanzar tus metas de triatlón y maratón.</p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div id="plan-long-term-card" class="card rounded-2xl p-6 text-center cursor-pointer hover:border-amber-400 transition-all duration-300">
+                            <h2 id="plan-long-term-title" class="text-2xl font-semibold mb-2">Planificar un objetivo a largo plazo</h2>
+                            <p id="plan-long-term-desc" class="text-blue-300">Define tu carrera y fecha objetivo. La IA creará tu plan de entrenamiento completo.</p>
+                        </div>
+                        <div id="plan-today-card" class="card rounded-2xl p-6 text-center cursor-pointer hover:border-amber-400 transition-all duration-300">
+                            <h2 id="plan-today-title" class="text-2xl font-semibold mb-2">Planificar un entrenamiento para hoy</h2>
+                            <p id="plan-today-desc" class="text-blue-300">Obtén una sesión personalizada basada en tu estado y disponibilidad actual.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="long-term-planner" class="hidden view">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <button id="back-to-main-lt" class="btn-primary px-4 py-2 rounded-lg font-bold whitespace-nowrap">&lt; <span data-lang="back">Atrás</span></button>
+                        <h2 id="long-term-planner-title" class="text-3xl font-bold text-center flex-grow">Plan de Objetivo a Largo Plazo</h2>
+                        <div></div> </div>
+                    <div class="card rounded-2xl p-6">
+                        <div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
+                            <div class="space-y-6">
+                                <div>
+                                    <label for="goal-type" id="goal-type-label" class="block mb-2 font-medium">1. Elige tu objetivo</label>
+                                    <select id="goal-type" class="w-full bg-blue-900/50 border border-blue-700 rounded-lg p-3">
+                                        <option value="race_10k" data-lang="race_10k">Carrera 10 Km</option>
+                                        <option value="half-marathon" data-lang="half_marathon">Media Maratón</option>
+                                        <option value="marathon" data-lang="marathon">Maratón</option>
+                                        <option value="tri-sprint" data-lang="tri_sprint">Triatlón Sprint</option>
+                                        <option value="tri-olympic" data-lang="tri_olympic">Triatlón Olímpico</option>
+                                        <option value="tri-md" data-lang="tri_md">Triatlón MD</option>
+                                        <option value="tri-ld" data-lang="tri_ld">Triatlón LD</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="level-slider" id="level-label" class="block mb-2 font-medium">2. Elige tu nivel: <span id="level-value-text" class="font-bold text-amber-300" data-lang="beginner">Iniciación</span></label>
+                                    <input id="level-slider" type="range" min="0" max="2" value="0" class="w-full h-2 bg-blue-800 rounded-lg appearance-none cursor-pointer slider-thumb">
+                                </div>
+                                <div id="time-goal-container" class="space-y-2 hidden">
+                                    <label id="time-goal-label" class="block mb-2 font-medium" data-lang="time_goal_label">4. Marca Objetivo (Opcional)</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="goal-hours" placeholder="HH" class="w-1/3 bg-blue-900/50 border border-blue-700 rounded-lg p-2 text-center" min="0">
+                                        <span class="font-bold">:</span>
+                                        <input type="number" id="goal-minutes" placeholder="MM" class="w-1/3 bg-blue-900/50 border border-blue-700 rounded-lg p-2 text-center" min="0" max="59">
+                                        <span class="font-bold">:</span>
+                                        <input type="number" id="goal-seconds" placeholder="SS" class="w-1/3 bg-blue-900/50 border border-blue-700 rounded-lg p-2 text-center" min="0" max="59">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label id="goal-date-label" class="block mb-2 font-medium">3. Selecciona la fecha de la carrera</label>
+                                <div id="calendar" class="bg-blue-900/50 rounded-lg p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <button id="prev-month" class="p-2 rounded-full hover:bg-blue-800">&lt;</button>
+                                        <h3 id="month-year" class="font-semibold"></h3>
+                                        <button id="next-month" class="p-2 rounded-full hover:bg-blue-800">&gt;</button>
+                                    </div>
+                                    <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="generate-long-term-plan-btn" class="btn-primary w-full mt-6 py-3 rounded-lg font-bold" data-lang="generate_plan">Generar Plan</button>
+                    </div>
+                </div>
+
+                <div id="today-planner" class="hidden view">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <button id="back-to-main-tp" class="btn-primary px-4 py-2 rounded-lg font-bold whitespace-nowrap">&lt; <span data-lang="back">Atrás</span></button>
+                        <h2 id="today-planner-title" class="text-3xl font-bold text-center flex-grow">Entrenamiento para Hoy</h2>
+                        <div></div> </div>
+                    <div class="card rounded-2xl p-6 space-y-6">
+                        <div>
+                            <label for="fatigue-slider" id="fatigue-label" class="block mb-2 font-medium">Fatiga actual: <span id="fatigue-value">5</span>/10</label>
+                            <input id="fatigue-slider" type="range" min="0" max="10" value="5" class="w-full h-2 bg-blue-800 rounded-lg appearance-none cursor-pointer slider-thumb">
+                        </div>
+                        <div>
+                            <label for="discipline-select" id="discipline-label" class="block mb-2 font-medium">Disciplina</label>
+                            <select id="discipline-select" class="w-full bg-blue-900/50 border border-blue-700 rounded-lg p-3">
+                                <option value="run" data-lang="running">Carrera</option>
+                                <option value="bike" data-lang="cycling">Ciclismo</option>
+                                <option value="swim" data-lang="swimming">Natación</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="effort-slider" id="effort-label" class="block mb-2 font-medium">Nivel de exigencia: <span id="effort-value">5</span>/10</label>
+                            <input id="effort-slider" type="range" min="0" max="10" value="5" class="w-full h-2 bg-blue-800 rounded-lg appearance-none cursor-pointer slider-thumb">
+                        </div>
+                        <div>
+                            <label for="duration-input" id="duration-label" class="block mb-2 font-medium">Duración (minutos)</label>
+                            <input id="duration-input" type="number" value="60" class="w-full bg-blue-900/50 border border-blue-700 rounded-lg p-3">
+                        </div>
+                        <button id="generate-today-plan-btn" class="btn-primary w-full mt-4 py-3 rounded-lg font-bold" data-lang="generate_workout">Generar Entrenamiento</button>
+                    </div>
+                </div>
+
+                <div id="plan-display" class="hidden view">
+                    <div class="flex justify-between items-center mb-6 gap-4">
+                        <button id="back-btn" class="btn-primary px-4 py-2 rounded-lg font-bold whitespace-nowrap">&lt; <span data-lang="back">Atrás</span></button>
+                        <h2 id="plan-title" class="text-2xl md:text-3xl font-bold text-center flex-grow">Tu Plan de Entrenamiento</h2>
+                        <button id="download-pdf-btn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold whitespace-nowrap" data-lang="download_pdf">Descargar PDF</button>
+                    </div>
+                    <div id="plan-content-wrapper">
+                        <div id="plan-content" class="card rounded-2xl p-6 max-h-[60vh] overflow-y-auto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Overlay de carga -->
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[110]">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos de la interfaz
+            const landingView = document.getElementById('landing-view');
+            const appViewWrapper = document.getElementById('app-view-wrapper');
+            const landingNavButtons = document.getElementById('landing-nav-buttons');
+            const appNavButtons = document.getElementById('app-nav-buttons');
+            const startNowBtnNav = document.getElementById('start-now-btn-nav');
+            const ctaStartApp = document.getElementById('cta-start-app');
+            const homeLogoBtn = document.getElementById('home-logo-btn');
+            const loadingOverlay = document.getElementById('loading-overlay');
+
+            // --- Funciones de navegación ---
+            
+            /**
+             * Muestra la vista de la aplicación principal y oculta la página de inicio.
+             */
+            function showApp() {
+                landingView.style.display = 'none';
+                appViewWrapper.classList.remove('hidden');
+                landingNavButtons.style.display = 'none';
+                appNavButtons.classList.remove('hidden');
+                appNavButtons.style.display = 'flex';
+                initApp();
+            }
+
+            /**
+             * Muestra la página de inicio y oculta la vista de la aplicación.
+             */
+            function showLanding() {
+                appViewWrapper.classList.add('hidden');
+                landingView.style.display = 'block';
+                appNavButtons.style.display = 'none';
+                landingNavButtons.style.display = 'flex';
+                // Limpia el hash de la URL para evitar estados no deseados al recargar
+                history.pushState("", document.title, window.location.pathname + window.location.search);
+            }
+
+            // --- Event Listeners para la navegación principal ---
+
+            // Botones "Comenzar ahora" que llevan a la aplicación
+            startNowBtnNav?.addEventListener('click', showApp);
+            ctaStartApp?.addEventListener('click', showApp);
+            
+            // El logo siempre lleva a la página de inicio
+            homeLogoBtn?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showLanding();
+            });
+
+
+            // --- CÓDIGO DE LA APLICACIÓN (Lógica de entrenamiento) ---
+            
+            // Objeto con todas las traducciones para soportar múltiples idiomas
+            const translations = {
+                es: {
+                    app_title: "Entrenador Personal IA", app_subtitle: "Tu compañero inteligente para alcanzar tus metas de triatlón y maratón.",
+                    plan_long_term_title: "Planificar un objetivo a largo plazo", plan_long_term_desc: "Define tu carrera y fecha objetivo. La IA creará tu plan de entrenamiento completo.",
+                    plan_today_title: "Planificar un entrenamiento para hoy", plan_today_desc: "Obtén una sesión personalizada basada en tu estado y disponibilidad actual.",
+                    long_term_planner_title: "Plan de Objetivo a Largo Plazo", goal_type_label: "1. Elige tu objetivo", level_label: "2. Elige tu nivel:",
+                    goal_date_label: "3. Selecciona la fecha de la carrera", time_goal_label: "4. Marca Objetivo (Opcional)", generate_plan: "Generar Plan",
+                    today_planner_title: "Entrenamiento para Hoy", fatigue_label: "Fatiga actual:", discipline_label: "Disciplina", effort_label: "Nivel de exigencia:",
+                    duration_label: "Duración (minutos)", generate_workout: "Generar Entrenamiento", back: "Atrás", download_pdf: "Descargar PDF",
+                    your_training_plan: "Tu Plan de Entrenamiento", running: "Carrera", cycling: "Ciclismo", swimming: "Natación", race_10k: "Carrera 10 Km",
+                    half_marathon: "Media Maratón", marathon: "Maratón", tri_sprint: "Triatlón Sprint", tri_olympic: "Triatlón Olímpico", tri_md: "Triatlón Media Distancia",
+                    tri_ld: "Triatlón Larga Distancia", beginner: "Iniciación", intermediate: "Medio", advanced: "Alto", week: "Semana", phase: "Fase", base: "Base",
+                    build: "Construcción", peak: "Pico", taper: "Puesta a punto", recovery: "Recuperación", rest_day: "Día de Descanso", long_run: "Tirada Larga",
+                    tempo_run: "Carrera a Ritmo (Tempo)", interval_run: "Series (Intervalos)", easy_run: "Carrera Suave", long_ride: "Rodaje Largo",
+                    interval_ride: "Series en Bici", easy_ride: "Rodaje Suave", brick_workout: "Entrenamiento Ladrillo (Bici + Carrera)",
+                    tech_swim: "Técnica de Natación", endurance_swim: "Natación de Resistencia", months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                    days_short: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"], error_past_date: "Por favor, selecciona una fecha futura.",
+                    error_min_weeks: (weeks) => `Se necesitan al menos ${weeks} semanas para un plan efectivo.`, workout_for_today: "Entrenamiento para Hoy",
+                    warmup: "Calentamiento", main_set: "Parte Principal", cooldown: "Vuelta a la Calma", rpe_explanation: "Nota: RPE (Tasa de Esfuerzo Percibido) es una escala de 1 (muy fácil) a 10 (esfuerzo máximo) para medir la intensidad que sientes.",
+                    recovery_session: "Sesión de Recuperación", high_fatigue_warning: "Fatiga alta. Se recomienda una sesión muy suave o descanso.", easy_endurance_session: "Rodaje Suave de Resistencia",
+                    long_run_quality_session: "Tirada Larga con Calidad", interval_session_short: "Sesión de Series Cortas", interval_session_long: "Sesión de Series Largas",
+                    hill_session: "Sesión de Cuestas", fartlek_session: "Sesión de Fartlek (Cambios de Ritmo)", tempo_session: "Sesión de Ritmo Controlado (Tempo)",
+                    progressive_run_session: "Rodaje Progresivo", pace_per_km: "ritmo/km", strength_training: "Entrenamiento de Fuerza", walk_run_session: "Sesión Caminar-Correr", walking: "caminando",
+                },
+                en: { /* English translations omitted for brevity */ },
+                fr: { /* French translations omitted for brevity */ }
+            };
+
+            let currentLang = 'es';
+            let currentDate = new Date();
+            let selectedDate = null;
+
+            /**
+             * Navega entre las diferentes vistas de la aplicación (menú, planificador, etc.).
+             * @param {string} viewId - El ID de la vista a mostrar.
+             * @param {boolean} pushToHistory - Si se debe añadir al historial del navegador.
+             */
+            function navigateTo(viewId, pushToHistory = true) {
+                if (pushToHistory) {
+                    history.pushState({ view: viewId }, '', `#${viewId}`);
+                }
+
+                appViewWrapper.querySelectorAll('.view').forEach(v => {
+                    if (v.id === viewId) {
+                        v.style.position = 'relative';
+                        v.classList.remove('hidden');
+                    } else {
+                        v.style.position = 'absolute';
+                        v.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Maneja los botones de atrás/adelante del navegador
+            window.addEventListener('popstate', (event) => {
+                if (event.state && event.state.view) {
+                    navigateTo(event.state.view, false);
+                } else {
+                    // Si no hay estado, volvemos al menú principal de la app
+                    // o a la landing si el usuario ha salido de la app.
+                    if (appViewWrapper.classList.contains('hidden')) {
+                        showLanding();
+                    } else {
+                        navigateTo('main-menu', false);
+                    }
+                }
+            });
+
+            /**
+             * Actualiza todos los textos de la interfaz según el idioma seleccionado.
+             */
+            function updateTexts() {
+                const langDict = translations[currentLang] || translations.es;
+                document.title = langDict.app_title;
+                document.querySelectorAll('[data-lang]').forEach(el => {
+                    const key = el.dataset.lang;
+                    if(langDict[key] && typeof langDict[key] === 'string') el.textContent = langDict[key];
+                });
+                // Actualiza textos específicos que no usan data-lang
+                document.getElementById('app-title').textContent = langDict.app_title;
+                document.getElementById('app-subtitle').textContent = langDict.app_subtitle;
+                document.getElementById('plan-long-term-title').textContent = langDict.plan_long_term_title;
+                document.getElementById('plan-long-term-desc').textContent = langDict.plan_long_term_desc;
+                document.getElementById('plan-today-title').textContent = langDict.plan_today_title;
+                document.getElementById('plan-today-desc').textContent = langDict.plan_today_desc;
+                document.getElementById('long-term-planner-title').textContent = langDict.long_term_planner_title;
+                document.getElementById('goal-type-label').textContent = langDict.goal_type_label;
+                document.getElementById('level-label').firstChild.textContent = langDict.level_label + ' ';
+                document.getElementById('goal-date-label').textContent = langDict.goal_date_label;
+                document.getElementById('time-goal-label').textContent = langDict.time_goal_label;
+                document.getElementById('today-planner-title').textContent = langDict.today_planner_title;
+                document.getElementById('fatigue-label').firstChild.textContent = langDict.fatigue_label + ' ';
+                document.getElementById('discipline-label').textContent = langDict.discipline_label;
+                document.getElementById('effort-label').firstChild.textContent = langDict.effort_label + ' ';
+                document.getElementById('duration-label').textContent = langDict.duration_label;
+                appViewWrapper.querySelectorAll('#goal-type option').forEach(opt => { const key = opt.dataset.lang; if (langDict[key]) opt.textContent = langDict[key]; });
+                appViewWrapper.querySelectorAll('#discipline-select option').forEach(opt => { const key = opt.dataset.lang; if (langDict[key]) opt.textContent = langDict[key]; });
+                updateLevelSliderText();
+                if (document.getElementById('plan-display').classList.contains('hidden')) document.getElementById('plan-title').textContent = langDict.your_training_plan;
+                renderCalendar();
+            }
+
+            function updateLevelSliderText() {
+                const levelSlider = document.getElementById('level-slider');
+                const levelValueText = document.getElementById('level-value-text');
+                const levelMap = ['beginner', 'intermediate', 'advanced'];
+                levelValueText.textContent = (translations[currentLang] || translations.es)[levelMap[levelSlider.value]];
+            }
+
+            function renderCalendar() {
+                const monthYearEl = document.getElementById('month-year');
+                const calendarDaysEl = document.getElementById('calendar-days');
+                const month = currentDate.getMonth(); const year = currentDate.getFullYear();
+                const langDict = translations[currentLang] || translations.es;
+                monthYearEl.textContent = `${langDict.months[month]} ${year}`;
+                calendarDaysEl.innerHTML = '';
+                langDict.days_short.forEach(day => {
+                    const dayEl = document.createElement('div'); dayEl.textContent = day; dayEl.className = 'font-bold text-sm text-blue-300';
+                    calendarDaysEl.appendChild(dayEl);
+                });
+                const firstDayOfMonth = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+                for (let i = 0; i < firstDayOfMonth; i++) calendarDaysEl.appendChild(document.createElement('div'));
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayEl = document.createElement('div'); dayEl.textContent = i;
+                    dayEl.className = 'p-2 cursor-pointer rounded-full hover:bg-blue-800 calendar-day';
+                    const dayDate = new Date(year, month, i);
+                    if (dayDate < new Date().setHours(0,0,0,0)) dayEl.classList.add('text-gray-500', 'cursor-not-allowed');
+                    else dayEl.addEventListener('click', () => {
+                        document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
+                        selectedDate = dayDate; dayEl.classList.add('selected');
+                    });
+                    if (selectedDate && selectedDate.getTime() === dayDate.getTime()) dayEl.classList.add('selected');
+                    calendarDaysEl.appendChild(dayEl);
+                }
+            }
+
+            function generateTodayWorkout(fatigue, discipline, effort, duration) {
+                const langDict = translations[currentLang] || translations.es;
+                let workout = { title: '', description: '', warmup: '', mainSet: '', cooldown: '' };
+                const warmupTime = Math.max(10, Math.floor(duration * 0.20)); const cooldownTime = Math.max(5, Math.floor(duration * 0.15));
+                let mainSetTime = duration - warmupTime - cooldownTime; if (mainSetTime < 5) mainSetTime = 5;
+                workout.warmup = `${warmupTime} min.`; workout.cooldown = `${cooldownTime} min.`;
+                if (fatigue >= 8) {
+                    workout.title = langDict.recovery_session; workout.description = langDict.high_fatigue_warning;
+                    workout.mainSet = `${mainSetTime} min (RPE 2-3).`;
+                } else if (fatigue >= 6) {
+                    workout.title = langDict.easy_endurance_session; workout.mainSet = `${mainSetTime} min (RPE 4-5).`;
+                } else {
+                    if (effort <= 3) { workout.title = langDict.recovery_session; workout.mainSet = `${mainSetTime} min (RPE 3-4).`; }
+                    else if (effort <= 5) { workout.title = langDict.easy_endurance_session; workout.mainSet = `${mainSetTime} min (RPE 5-6).`; }
+                    else if (effort <= 7) {
+                        workout.title = langDict.tempo_session; const tempoTime = Math.max(10, Math.floor(mainSetTime * 0.6));
+                        workout.mainSet = `2 x ${Math.floor(tempoTime/2)} min (RPE 7-8), rec: 3-4 min.`;
+                    } else {
+                        workout.title = langDict.interval_session_short; const reps = Math.max(5, Math.floor(mainSetTime / 3));
+                        workout.mainSet = `${reps} x 90s (RPE 9), rec: 90s.`;
+                    }
+                }
+                return workout;
+            }
+
+            function calculatePaces(goalType, timeGoal) {
+                const distances = { 'race_10k': 10, 'half-marathon': 21.097, 'marathon': 42.195 };
+                if (!timeGoal || !distances[goalType]) return null;
+                const totalSeconds = (timeGoal.hours * 3600) + (timeGoal.minutes * 60) + timeGoal.seconds;
+                if (totalSeconds === 0) return null;
+                const secondsPerKm = totalSeconds / distances[goalType];
+                const formatPace = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+                return { racePace: formatPace(secondsPerKm), easyPace: formatPace(secondsPerKm + 75), tempoPace: formatPace(secondsPerKm + 20), intervalPace: formatPace(secondsPerKm - 15) };
+            }
+
+            function getDetailedWorkout(dayIndex, weekPercent, goalType, level, langDict, paces) {
+                const levels = { beginner: 0, intermediate: 1, advanced: 2 }; const l = levels[level];
+                const isRace = goalType.includes('race') || goalType.includes('marathon'); const isTri = goalType.includes('tri');
+                const getPaceText = (type) => paces ? `(~${paces[type]} ${langDict.pace_per_km})` : ``;
+                const wu = (mins) => `${langDict.warmup}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
+                const cd = (mins) => `${langDict.cooldown}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
+                if (l === 0) {
+                    if (dayIndex === 1 || dayIndex === 5) return langDict.strength_training + ": 30-45 min (ej: sentadillas, zancadas, planchas).";
+                    if (dayIndex === 3) {
+                        const duration = 30 + Math.floor(weekPercent * 30); const runInterval = 8; const walkInterval = 2;
+                        const reps = Math.floor(duration / (runInterval + walkInterval));
+                        return `${langDict.walk_run_session}: ${reps}x (${runInterval}min ${langDict.running} / ${walkInterval}min ${langDict.walking}).`;
+                    }
+                    if (dayIndex === 6) {
+                        const duration = 45 + Math.floor(weekPercent * 45);
+                        if (weekPercent < 0.5) {
+                             const runInterval = 10; const walkInterval = 3; const reps = Math.floor(duration / (runInterval + walkInterval));
+                            return `${langDict.walk_run_session}: ${reps}x (${runInterval}min ${langDict.running} / ${walkInterval}min ${langDict.walking}).`;
+                        } else return `${langDict.easy_run}: ${duration}min ${getPaceText('easyPace')}.`;
+                    }
+                    return langDict.rest_day;
+                }
+                if (dayIndex === 2) { const reps = [4, 6, 8][l]; const rec = ['400m', '400m', '200m'][l]; const dist = (isRace && goalType.includes('10k')) ? '400m' : '800m'; return `${wu(15)}. ${langDict.main_set}: ${reps} x ${dist} ${getPaceText('intervalPace')} (rec: ${rec}). ${cd(10)}`; }
+                if (dayIndex === 4) {
+                     if (isTri) { const reps = [3, 5, 7][l]; const duration = [5, 8, 10][l]; return `${langDict.interval_ride}: ${reps} x ${duration}min.`; }
+                     else { const duration = [20, 30, 40][l]; const blocks = l > 0 ? `2x${duration/2}min` : `${duration}min`; return `${wu(15)}. ${langDict.main_set}: ${blocks} ${getPaceText('tempoPace')}. ${cd(10)}`; }
+                }
+                if (dayIndex === 0) {
+                    const baseKm = { 'race_10k': 8, 'half-marathon': 12, 'marathon': 16, 'tri-sprint': 5, 'tri-olympic': 8, 'tri-md': 10, 'tri-ld': 14 };
+                    const peakKm = { 'race_10k': 12, 'half-marathon': 20, 'marathon': 32, 'tri-sprint': 10, 'tri-olympic': 15, 'tri-md': 21, 'tri-ld': 25 };
+                    const dist = Math.round(baseKm[goalType] + (peakKm[goalType] - baseKm[goalType]) * weekPercent);
+                    return `${langDict.long_run}: ${dist}km ${getPaceText('easyPace')}`;
+                }
+                if (isTri) {
+                    if (dayIndex === 1) return `${langDict.endurance_swim}: ${[1500, 2000, 2500][l]}m.`;
+                    if (dayIndex === 5) return `${langDict.brick_workout}: 45min ${langDict.easy_ride} + 20min ${langDict.easy_run}.`;
+                }
+                if (isRace) {
+                     if (dayIndex === 1 || dayIndex === 5) {
+                        if (dayIndex === 1 && l > 0) return `${langDict.strength_training}: 45-60 min (ej: peso muerto, press, dominadas).`;
+                        return `${langDict.easy_run}: ${[30, 45, 50][l]}min ${getPaceText('easyPace')}.`;
+                     }
+                }
+                return langDict.rest_day;
+            }
+
+            function generateLongTermPlan(goalType, level, targetDate, timeGoal) {
+                const langDict = translations[currentLang] || translations.es;
+                const today = new Date(); const weeksUntil = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24 * 7));
+                const minWeeks = { 'race_10k': 8, 'half-marathon': 10, 'marathon': 16, 'tri-sprint': 8, 'tri-olympic': 12, 'tri-md': 16, 'tri-ld': 20 };
+                if (weeksUntil < minWeeks[goalType]) { alert(langDict.error_min_weeks(minWeeks[goalType])); return null; }
+                const paces = calculatePaces(goalType, timeGoal); let plan = [];
+                for (let i = 0; i < weeksUntil; i++) {
+                    const weekNum = weeksUntil - i; const weekPercent = i / weeksUntil;
+                    let phase;
+                    if (weekNum <= 2) phase = langDict.taper; else if (weekNum <= 4 && (i + 1) % 4 === 0) phase = langDict.recovery;
+                    else if (weekPercent > 0.75) phase = langDict.peak; else if (weekPercent > 0.3) phase = langDict.build; else phase = langDict.base;
+                    let weeklyWorkouts = {};
+                    for (let day = 0; day < 7; day++) {
+                        const dayName = langDict.days_short[day];
+                        if (phase === langDict.taper) weeklyWorkouts[dayName] = (day % 2 !== 0) ? `${langDict.easy_run}: 20-30 min` : langDict.rest_day;
+                        else if (phase === langDict.recovery) weeklyWorkouts[dayName] = (day === 1 || day === 3 || day === 5) ? `${langDict.easy_run}: 30-40 min` : langDict.rest_day;
+                        else weeklyWorkouts[dayName] = getDetailedWorkout(day, weekPercent, goalType, level, langDict, paces);
+                    }
+                    plan.push({ week: i + 1, phase, workouts: weeklyWorkouts });
+                }
+                return plan;
+            }
+
+            function displayWorkout(workout) {
+                const langDict = translations[currentLang] || translations.es;
+                document.getElementById('plan-title').textContent = workout.title;
+                document.getElementById('plan-content').innerHTML = `
+                    ${workout.description ? `<p class="mb-4 text-amber-300">${workout.description}</p>` : ''}
+                    <div class="space-y-4">
+                        <div><h3 class="text-xl font-semibold text-amber-400">${langDict.warmup}</h3><p>${workout.warmup}</p></div>
+                        <div><h3 class="text-xl font-semibold text-amber-400">${langDict.main_set}</h3><p>${workout.mainSet}</p></div>
+                        <div><h3 class="text-xl font-semibold text-amber-400">${langDict.cooldown}</h3><p>${workout.cooldown}</p></div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-blue-700/50"><p class="text-sm text-blue-300">${langDict.rpe_explanation}</p></div>
+                `;
+                navigateTo('plan-display');
+            }
+
+            function displayLongTermPlan(plan) {
+                const langDict = translations[currentLang] || translations.es;
+                document.getElementById('plan-title').textContent = langDict.your_training_plan;
+                let html = '<div class="space-y-6">';
+                plan.forEach(week => {
+                    html += `<div class="p-4 rounded-lg bg-blue-900/40"><div class="flex justify-between items-baseline mb-3"><h3 class="text-xl font-semibold text-amber-400">${langDict.week} ${week.week}</h3><span class="text-sm font-medium bg-amber-500/20 text-amber-300 px-2 py-1 rounded">${week.phase}</span></div><ul class="space-y-2 text-sm">`;
+                    const orderedDays = [langDict.days_short[1], langDict.days_short[2], langDict.days_short[3], langDict.days_short[4], langDict.days_short[5], langDict.days_short[6], langDict.days_short[0]];
+                    orderedDays.forEach(day => {
+                        const originalDayIndex = langDict.days_short.indexOf(day);
+                        const workout = week.workouts[langDict.days_short[originalDayIndex]] || langDict.rest_day;
+                        html += `<li class="flex border-b border-blue-800/50 py-2"><strong class="w-12">${day}:</strong><span>${workout}</span></li>`;
+                    });
+                    html += `</ul></div>`;
+                });
+                html += '</div>';
+                document.getElementById('plan-content').innerHTML = html;
+                navigateTo('plan-display');
+            }
+
+            // --- Event Listeners de los componentes de la aplicación ---
+            document.getElementById('language-selector').addEventListener('change', (e) => { currentLang = e.target.value; updateTexts(); });
+            document.getElementById('plan-long-term-card').addEventListener('click', () => navigateTo('long-term-planner'));
+            document.getElementById('plan-today-card').addEventListener('click', () => navigateTo('today-planner'));
+
+            // Botones para volver al menú anterior
+            document.getElementById('back-btn').addEventListener('click', () => history.back());
+            document.getElementById('back-to-main-lt').addEventListener('click', () => history.back());
+            document.getElementById('back-to-main-tp').addEventListener('click', () => history.back());
+
+            // Controles del calendario
+            document.getElementById('prev-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
+            document.getElementById('next-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+            
+            // Sliders y inputs
+            document.getElementById('fatigue-slider').addEventListener('input', (e) => { document.getElementById('fatigue-value').textContent = e.target.value; });
+            document.getElementById('effort-slider').addEventListener('input', (e) => { document.getElementById('effort-value').textContent = e.target.value; });
+            document.getElementById('level-slider').addEventListener('input', updateLevelSliderText);
+            
+            document.getElementById('goal-type').addEventListener('change', (e) => {
+                const timeGoalContainer = document.getElementById('time-goal-container');
+                if (['race_10k', 'half-marathon', 'marathon'].includes(e.target.value)) timeGoalContainer.classList.remove('hidden');
+                else timeGoalContainer.classList.add('hidden');
+            });
+
+            // Botones de generación de planes
+            document.getElementById('generate-today-plan-btn').addEventListener('click', () => {
+                loadingOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    const fatigue = parseInt(document.getElementById('fatigue-slider').value, 10); const discipline = document.getElementById('discipline-select').value;
+                    const effort = parseInt(document.getElementById('effort-slider').value, 10); const duration = parseInt(document.getElementById('duration-input').value, 10);
+                    const workout = generateTodayWorkout(fatigue, discipline, effort, duration);
+                    displayWorkout(workout); loadingOverlay.classList.add('hidden');
+                }, 1000);
+            });
+            document.getElementById('generate-long-term-plan-btn').addEventListener('click', () => {
+                if (!selectedDate || selectedDate < new Date().setHours(0,0,0,0)) { alert((translations[currentLang] || translations.es).error_past_date); return; }
+                loadingOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    const goalType = document.getElementById('goal-type').value; const level = ['beginner', 'intermediate', 'advanced'][document.getElementById('level-slider').value];
+                    let timeGoal = null;
+                    const timeGoalContainer = document.getElementById('time-goal-container');
+                    if (!timeGoalContainer.classList.contains('hidden')) {
+                        const h = parseInt(document.getElementById('goal-hours').value, 10) || 0; const m = parseInt(document.getElementById('goal-minutes').value, 10) || 0;
+                        const s = parseInt(document.getElementById('goal-seconds').value, 10) || 0;
+                        if(h > 0 || m > 0 || s > 0) timeGoal = { hours: h, minutes: m, seconds: s };
+                    }
+                    const plan = generateLongTermPlan(goalType, level, selectedDate, timeGoal);
+                    if (plan) displayLongTermPlan(plan);
+                    loadingOverlay.classList.add('hidden');
+                }, 1500);
+            });
+
+            // Botón de descarga de PDF
+            document.getElementById('download-pdf-btn').addEventListener('click', async () => {
+                const { jsPDF } = window.jspdf; const contentEl = document.getElementById('plan-content');
+                const wrapperEl = document.getElementById('plan-content-wrapper'); const planTitle = document.getElementById('plan-title').textContent;
+                const fileName = `${planTitle.replace(/ /g, '_')}.pdf`; loadingOverlay.classList.remove('hidden');
+                const originalMaxHeight = contentEl.style.maxHeight; const originalOverflowY = contentEl.style.overflowY;
+                contentEl.style.maxHeight = 'none'; contentEl.style.overflowY = 'visible';
+                await new Promise(resolve => setTimeout(resolve, 0));
+                try {
+                    const canvas = await html2canvas(wrapperEl, { scale: 2, useCORS: true, backgroundColor: '#1e3a8a' });
+                    const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF({ orientation: 'p', unit: 'px', format: [canvas.width, canvas.height] });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height); pdf.save(fileName);
+                } catch (error) { console.error("Error generating PDF:", error); alert("Error generando PDF. Por favor, inténtalo de nuevo.");
+                } finally {
+                    contentEl.style.maxHeight = originalMaxHeight; contentEl.style.overflowY = originalOverflowY;
+                    loadingOverlay.classList.add('hidden');
+                }
+            });
+
+            /**
+             * Inicializa la aplicación, determina qué vista mostrar y actualiza los textos.
+             */
+            function initApp() {
+                const viewFromHash = window.location.hash.substring(1);
+                const validViews = ['main-menu', 'long-term-planner', 'today-planner', 'plan-display'];
+                if (validViews.includes(viewFromHash)) {
+                    navigateTo(viewFromHash, false);
+                } else {
+                    navigateTo('main-menu');
+                }
+                updateTexts();
+                document.getElementById('goal-type').dispatchEvent(new Event('change'));
+            }
+
+            // Inicialización al cargar la página: siempre muestra la página de inicio.
+            showLanding();
+        });
+    </script>
+</body>
+</html>
