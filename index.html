@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrena.ai - Tu Entrenador Personal IA Gratuito</title>
 
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fbbf24'%3E%3Cpath d='M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z'/%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fbbf24'%3E%3Cpath d='M4 4h4v12H4V4zm6 6h4v6h-4v-6zm6-3h4v9h-4V7z'/%E3%E%3C/svg%3E">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -99,34 +99,37 @@
 </head>
 <body class="selection:bg-amber-300 selection:text-blue-900">
 
-    <nav class="navbar p-4 flex justify-between items-center fixed top-0 left-0 w-full z-50 h-[80px]">
-        <a href="#" id="home-logo-btn" class="flex items-center gap-3 cursor-pointer">
-            <svg class="w-8 h-8 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z"/>
-            </svg>
-            <span class="text-2xl font-bold text-white">entrena.ai</span>
-        </a>
-
-        <!-- Botones de navegación para la página de inicio -->
-        <div id="landing-nav-buttons" class="flex items-center gap-4">
-            <button id="start-now-btn-nav" class="btn-primary px-5 py-2 rounded-lg font-semibold">Comenzar ahora</button>
+    <nav class="navbar p-4 grid grid-cols-3 items-center fixed top-0 left-0 w-full z-50 h-[80px]">
+        <div class="flex justify-start">
+             <div id="landing-nav-buttons">
+                <button id="start-now-btn-nav" class="btn-primary px-5 py-2 rounded-lg font-semibold">Comenzar ahora</button>
+            </div>
         </div>
 
-        <!-- Botones de navegación para la aplicación -->
-        <div id="app-nav-buttons" class="hidden items-center gap-4">
-             <div id="language-selector-container">
-                <select id="language-selector" class="bg-blue-900/50 border border-blue-700 rounded-lg px-3 py-1 text-sm text-white">
-                    <option value="es">Español</option>
-                    <option value="en">English</option>
-                    <option value="fr">Français</option>
-                </select>
+        <div class="flex justify-center">
+            <a href="#" id="home-logo-btn" class="flex items-center gap-3 cursor-pointer">
+                <svg class="w-10 h-10 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 4h4v12H4V4zm6 6h4v6h-4v-6zm6-3h4v9h-4V7z"></path>
+                </svg>
+                <span class="text-2xl font-bold text-white">entrena.ai</span>
+            </a>
+        </div>
+
+        <div class="flex justify-end">
+            <div id="app-nav-buttons" class="hidden items-center gap-4">
+                 <div id="language-selector-container">
+                    <select id="language-selector" class="bg-blue-900/50 border border-blue-700 rounded-lg px-3 py-1 text-sm text-white">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="pt-[80px]">
 
-        <!-- Vista de la página de inicio -->
         <div id="landing-view">
             <div class="flex-grow flex flex-col items-center justify-center pt-16 pb-16 px-4">
                 <section class="text-center mb-16 max-w-4xl">
@@ -183,14 +186,13 @@
             </div>
         </div>
 
-        <!-- Contenedor principal de la aplicación -->
         <div id="app-view-wrapper" class="hidden">
             <div class="w-full max-w-4xl mx-auto">
 
                 <div id="main-menu" class="text-center view">
                     <div class="flex items-center justify-center gap-3 mb-4">
-                        <svg id="logo" class="w-10 h-10 md:w-12 md:h-12 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21.93,10.29,15.2,3.57a1,1,0,0,0-1.4,0L11.18,6.19l-1.76-2.65a1,1,0,0,0-1.28-.42,1,1,0,0,0-.42,1.28l2.2,3.3-3.09,3.09H3a1,1,0,0,0,0,2H8.49l-2.6,2.6a1,1,0,0,0,0,1.4,1,1,0,0,0,1.4,0L10.9,13.8l3.71,3.71a1,1,0,0,0,1.4,0l6-6A1,1,0,0,0,21.93,10.29Z"/>
+                         <svg id="logo-app" class="w-12 h-12 text-amber-300" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                           <path d="M4 4h4v12H4V4zm6 6h4v6h-4v-6zm6-3h4v9h-4V7z"></path>
                         </svg>
                         <h1 id="app-title" class="text-4xl md:text-5xl font-bold">Entrenador Personal IA</h1>
                     </div>
@@ -304,7 +306,6 @@
         </div>
     </main>
 
-    <!-- Overlay de carga -->
     <div id="loading-overlay" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-[110]">
         <div class="loader"></div>
     </div>
@@ -323,9 +324,6 @@
 
             // --- Funciones de navegación ---
             
-            /**
-             * Muestra la vista de la aplicación principal y oculta la página de inicio.
-             */
             function showApp() {
                 landingView.style.display = 'none';
                 appViewWrapper.classList.remove('hidden');
@@ -335,25 +333,17 @@
                 initApp();
             }
 
-            /**
-             * Muestra la página de inicio y oculta la vista de la aplicación.
-             */
             function showLanding() {
                 appViewWrapper.classList.add('hidden');
                 landingView.style.display = 'block';
                 appNavButtons.style.display = 'none';
-                landingNavButtons.style.display = 'flex';
-                // Limpia el hash de la URL para evitar estados no deseados al recargar
+                landingNavButtons.style.display = 'block';
                 history.pushState("", document.title, window.location.pathname + window.location.search);
             }
 
             // --- Event Listeners para la navegación principal ---
-
-            // Botones "Comenzar ahora" que llevan a la aplicación
             startNowBtnNav?.addEventListener('click', showApp);
             ctaStartApp?.addEventListener('click', showApp);
-            
-            // El logo siempre lleva a la página de inicio
             homeLogoBtn?.addEventListener('click', (e) => {
                 e.preventDefault();
                 showLanding();
@@ -362,7 +352,6 @@
 
             // --- CÓDIGO DE LA APLICACIÓN (Lógica de entrenamiento) ---
             
-            // Objeto con todas las traducciones para soportar múltiples idiomas
             const translations = {
                 es: {
                     app_title: "Entrenador Personal IA", app_subtitle: "Tu compañero inteligente para alcanzar tus metas de triatlón y maratón.",
@@ -386,82 +375,125 @@
                     long_run_quality_session: "Tirada Larga con Calidad", interval_session_short: "Sesión de Series Cortas", interval_session_long: "Sesión de Series Largas",
                     hill_session: "Sesión de Cuestas", fartlek_session: "Sesión de Fartlek (Cambios de Ritmo)", tempo_session: "Sesión de Ritmo Controlado (Tempo)",
                     progressive_run_session: "Rodaje Progresivo", pace_per_km: "ritmo/km", strength_training: "Entrenamiento de Fuerza", walk_run_session: "Sesión Caminar-Correr", walking: "caminando",
+                    strength_a: "Fuerza (A): 3x10 Sentadilla Goblet, 3x12 Zancadas, 3x10 Press Banca, 3x12 Remo c/m, 3x45s Plancha.",
+                    strength_b: "Fuerza (B): 3x10 Peso Muerto Rumano, 3x12 Puente de Glúteos, 3x10 Press Militar, 3xMax Dominadas, 3x45s Plancha Lateral.",
+                    strength_c: "Fuerza (C): 5x5 Sentadilla Trasera, 3x8 Peso Muerto una pierna, 3x8 Press inclinado, 3x10 Remo en polea.",
+                    strength_d: "Fuerza (D): 5x5 Peso Muerto Convencional, 3x8 Zancada Búlgara, 5x5 Press Militar, 3x10 Remo Pendlay.",
+                    strength_maintenance: "Mantenimiento: 2x15 Saltos al cajón, 2x15 Balanceo Kettlebell, 2x15 Lanzamiento Balón Medicinal, 2x15 Flexiones pliométricas."
                 },
-                en: { /* English translations omitted for brevity */ },
-                fr: { /* French translations omitted for brevity */ }
+                en: { // English translations...
+                    app_title: "AI Personal Trainer", app_subtitle: "Your intelligent partner to achieve your triathlon and marathon goals.",
+                    plan_long_term_title: "Plan a long-term goal", plan_long_term_desc: "Define your race and target date. The AI will create your complete training plan.",
+                    plan_today_title: "Plan a workout for today", plan_today_desc: "Get a personalized session based on your current state and availability.",
+                    long_term_planner_title: "Long-Term Goal Plan", goal_type_label: "1. Choose your goal", level_label: "2. Choose your level:",
+                    goal_date_label: "3. Select the race date", time_goal_label: "4. Set Time Goal (Optional)", generate_plan: "Generate Plan",
+                    today_planner_title: "Workout for Today", fatigue_label: "Current fatigue:", discipline_label: "Discipline", effort_label: "Effort level:",
+                    duration_label: "Duration (minutes)", generate_workout: "Generate Workout", back: "Back", download_pdf: "Download PDF",
+                    your_training_plan: "Your Training Plan", running: "Running", cycling: "Cycling", swimming: "Swimming", race_10k: "10k Race",
+                    half_marathon: "Half Marathon", marathon: "Marathon", tri_sprint: "Sprint Triathlon", tri_olympic: "Olympic Triathlon", tri_md: "Middle Distance Triathlon",
+                    tri_ld: "Long Distance Triathlon", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", week: "Week", phase: "Phase", base: "Base",
+                    build: "Build", peak: "Peak", taper: "Taper", recovery: "Recovery", rest_day: "Rest Day", long_run: "Long Run",
+                    tempo_run: "Tempo Run", interval_run: "Intervals", easy_run: "Easy Run", long_ride: "Long Ride",
+                    interval_ride: "Bike Intervals", easy_ride: "Easy Ride", brick_workout: "Brick Workout (Bike + Run)",
+                    tech_swim: "Swim Technique", endurance_swim: "Endurance Swim", months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                    days_short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], error_past_date: "Please select a future date.",
+                    error_min_weeks: (weeks) => `At least ${weeks} weeks are needed for an effective plan.`, workout_for_today: "Workout for Today",
+                    warmup: "Warm-up", main_set: "Main Set", cooldown: "Cool-down", rpe_explanation: "Note: RPE (Rate of Perceived Exertion) is a scale from 1 (very easy) to 10 (maximum effort) to measure how hard you feel you are working.",
+                    recovery_session: "Recovery Session", high_fatigue_warning: "High fatigue. A very light session or rest is recommended.", easy_endurance_session: "Easy Endurance Session",
+                    long_run_quality_session: "Quality Long Run", interval_session_short: "Short Interval Session", interval_session_long: "Long Interval Session",
+                    hill_session: "Hill Session", fartlek_session: "Fartlek Session (Pace Changes)", tempo_session: "Tempo Session",
+                    progressive_run_session: "Progressive Run", pace_per_km: "pace/km", strength_training: "Strength Training", walk_run_session: "Walk-Run Session", walking: "walking",
+                    strength_a: "Strength (A): 3x10 Goblet Squat, 3x12 Lunges, 3x10 Bench Press, 3x12 DB Row, 3x45s Plank.",
+                    strength_b: "Strength (B): 3x10 Romanian Deadlift, 3x12 Glute Bridge, 3x10 Military Press, 3xMax Pull-ups, 3x45s Side Plank.",
+                    strength_c: "Strength (C): 5x5 Back Squat, 3x8 Single Leg RDL, 3x8 Incline Press, 3x10 Seated Row.",
+                    strength_d: "Strength (D): 5x5 Conventional Deadlift, 3x8 Bulgarian Split Squat, 5x5 Military Press, 3x10 Pendlay Row.",
+                    strength_maintenance: "Maintenance: 2x15 Box Jumps, 2x15 Kettlebell Swings, 2x15 Med Ball Slams, 2x15 Plyo Push-ups."
+                },
+                fr: { // French translations...
+                    app_title: "Entraîneur Personnel IA", app_subtitle: "Votre partenaire intelligent pour atteindre vos objectifs de triathlon et de marathon.",
+                    plan_long_term_title: "Planifier un objectif à long terme", plan_long_term_desc: "Définissez votre course et votre date cible. L'IA créera votre plan d'entraînement complet.",
+                    plan_today_title: "Planifier un entraînement pour aujourd'hui", plan_today_desc: "Obtenez une session personnalisée en fonction de votre état actuel et de votre disponibilité.",
+                    long_term_planner_title: "Plan d'Objectif à Long Terme", goal_type_label: "1. Choisissez votre objectif", level_label: "2. Choisissez votre niveau:",
+                    goal_date_label: "3. Sélectionnez la date de la course", time_goal_label: "4. Définir un Objectif de Temps (Optionnel)", generate_plan: "Générer le Plan",
+                    today_planner_title: "Entraînement du Jour", fatigue_label: "Fatigue actuelle:", discipline_label: "Discipline", effort_label: "Niveau d'effort:",
+                    duration_label: "Durée (minutes)", generate_workout: "Générer l'Entraînement", back: "Retour", download_pdf: "Télécharger PDF",
+                    your_training_plan: "Votre Plan d'Entraînement", running: "Course à pied", cycling: "Vélo", swimming: "Natation", race_10k: "Course 10 Km",
+                    half_marathon: "Semi-Marathon", marathon: "Marathon", tri_sprint: "Triathlon Sprint", tri_olympic: "Triathlon Olympique", tri_md: "Triathlon Moyenne Distance",
+                    tri_ld: "Triathlon Longue Distance", beginner: "Débutant", intermediate: "Intermédiaire", advanced: "Avancé", week: "Semaine", phase: "Phase", base: "Base",
+                    build: "Construction", peak: "Pic", taper: "Affûtage", recovery: "Récupération", rest_day: "Jour de Repos", long_run: "Sortie Longue",
+                    tempo_run: "Course au Seuil (Tempo)", interval_run: "Fractionné (Intervalles)", easy_run: "Course Lente", long_ride: "Sortie Longue Vélo",
+                    interval_ride: "Fractionné Vélo", easy_ride: "Sortie Vélo Tranquille", brick_workout: "Enchaînement (Vélo + Course)",
+                    tech_swim: "Technique de Nage", endurance_swim: "Endurance Natation", months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+                    days_short: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"], error_past_date: "Veuillez sélectionner une date future.",
+                    error_min_weeks: (weeks) => `Un minimum de ${weeks} semaines est nécessaire pour un plan efficace.`, workout_for_today: "Entraînement du Jour",
+                    warmup: "Échauffement", main_set: "Corps de Séance", cooldown: "Retour au Calme", rpe_explanation: "Note : Le RPE (Échelle de Perception de l'Effort) est une échelle de 1 (très facile) à 10 (effort maximal) pour mesurer l'intensité ressentie.",
+                    recovery_session: "Session de Récupération", high_fatigue_warning: "Fatigue élevée. Une session très légère ou du repos est recommandé.", easy_endurance_session: "Session d'Endurance Facile",
+                    long_run_quality_session: "Sortie Longue de Qualité", interval_session_short: "Session d'Intervalles Courts", interval_session_long: "Session d'Intervalles Longs",
+                    hill_session: "Session en Côte", fartlek_session: "Session de Fartlek (Changements d'Allure)", tempo_session: "Session au Seuil (Tempo)",
+                    progressive_run_session: "Course Progressive", pace_per_km: "allure/km", strength_training: "Musculation", walk_run_session: "Session Marche-Course", walking: "en marchant",
+                    strength_a: "Musculation (A): 3x10 Goblet Squat, 3x12 Fentes, 3x10 Développé couché, 3x12 Rowing haltère, 3x45s Planche.",
+                    strength_b: "Musculation (B): 3x10 Soulevé de terre roumain, 3x12 Pont fessier, 3x10 Développé militaire, 3xMax Tractions, 3x45s Planche latérale.",
+                    strength_c: "Musculation (C): 5x5 Squat arrière, 3x8 Soulevé de terre unipodal, 3x8 Développé incliné, 3x10 Rowing assis.",
+                    strength_d: "Musculation (D): 5x5 Soulevé de terre conventionnel, 3x8 Fente bulgare, 5x5 Développé militaire, 3x10 Rowing Pendlay.",
+                    strength_maintenance: "Maintien: 2x15 Sauts sur boîte, 2x15 Kettlebell Swing, 2x15 Lancer de Medecine Ball, 2x15 Pompes pliométriques."
+                }
             };
 
             let currentLang = 'es';
             let currentDate = new Date();
             let selectedDate = null;
-
-            /**
-             * Navega entre las diferentes vistas de la aplicación (menú, planificador, etc.).
-             * @param {string} viewId - El ID de la vista a mostrar.
-             * @param {boolean} pushToHistory - Si se debe añadir al historial del navegador.
-             */
+            
             function navigateTo(viewId, pushToHistory = true) {
                 if (pushToHistory) {
                     history.pushState({ view: viewId }, '', `#${viewId}`);
                 }
-
                 appViewWrapper.querySelectorAll('.view').forEach(v => {
-                    if (v.id === viewId) {
-                        v.style.position = 'relative';
-                        v.classList.remove('hidden');
-                    } else {
-                        v.style.position = 'absolute';
-                        v.classList.add('hidden');
-                    }
+                    v.style.position = v.id === viewId ? 'relative' : 'absolute';
+                    v.classList.toggle('hidden', v.id !== viewId);
                 });
             }
-
-            // Maneja los botones de atrás/adelante del navegador
+            
             window.addEventListener('popstate', (event) => {
                 if (event.state && event.state.view) {
                     navigateTo(event.state.view, false);
                 } else {
-                    // Si no hay estado, volvemos al menú principal de la app
-                    // o a la landing si el usuario ha salido de la app.
-                    if (appViewWrapper.classList.contains('hidden')) {
-                        showLanding();
-                    } else {
-                        navigateTo('main-menu', false);
-                    }
+                    appViewWrapper.classList.contains('hidden') ? showLanding() : navigateTo('main-menu', false);
                 }
             });
-
-            /**
-             * Actualiza todos los textos de la interfaz según el idioma seleccionado.
-             */
+            
             function updateTexts() {
                 const langDict = translations[currentLang] || translations.es;
-                document.title = langDict.app_title;
                 document.querySelectorAll('[data-lang]').forEach(el => {
                     const key = el.dataset.lang;
                     if(langDict[key] && typeof langDict[key] === 'string') el.textContent = langDict[key];
                 });
-                // Actualiza textos específicos que no usan data-lang
-                document.getElementById('app-title').textContent = langDict.app_title;
-                document.getElementById('app-subtitle').textContent = langDict.app_subtitle;
-                document.getElementById('plan-long-term-title').textContent = langDict.plan_long_term_title;
-                document.getElementById('plan-long-term-desc').textContent = langDict.plan_long_term_desc;
-                document.getElementById('plan-today-title').textContent = langDict.plan_today_title;
-                document.getElementById('plan-today-desc').textContent = langDict.plan_today_desc;
-                document.getElementById('long-term-planner-title').textContent = langDict.long_term_planner_title;
-                document.getElementById('goal-type-label').textContent = langDict.goal_type_label;
+
+                const elementsToUpdate = {
+                    'app-title': 'app_title', 'app-subtitle': 'app_subtitle', 'plan-long-term-title': 'plan_long_term_title',
+                    'plan-long-term-desc': 'plan_long_term_desc', 'plan-today-title': 'plan_today_title', 'plan-today-desc': 'plan_today_desc',
+                    'long-term-planner-title': 'long_term_planner_title', 'goal-type-label': 'goal_type_label', 'goal-date-label': 'goal_date_label',
+                    'time-goal-label': 'time_goal_label', 'today-planner-title': 'today_planner_title', 'discipline-label': 'discipline_label',
+                    'duration-label': 'duration_label'
+                };
+                Object.entries(elementsToUpdate).forEach(([id, key]) => {
+                    document.getElementById(id).textContent = langDict[key];
+                });
+
                 document.getElementById('level-label').firstChild.textContent = langDict.level_label + ' ';
-                document.getElementById('goal-date-label').textContent = langDict.goal_date_label;
-                document.getElementById('time-goal-label').textContent = langDict.time_goal_label;
-                document.getElementById('today-planner-title').textContent = langDict.today_planner_title;
                 document.getElementById('fatigue-label').firstChild.textContent = langDict.fatigue_label + ' ';
-                document.getElementById('discipline-label').textContent = langDict.discipline_label;
                 document.getElementById('effort-label').firstChild.textContent = langDict.effort_label + ' ';
-                document.getElementById('duration-label').textContent = langDict.duration_label;
-                appViewWrapper.querySelectorAll('#goal-type option').forEach(opt => { const key = opt.dataset.lang; if (langDict[key]) opt.textContent = langDict[key]; });
-                appViewWrapper.querySelectorAll('#discipline-select option').forEach(opt => { const key = opt.dataset.lang; if (langDict[key]) opt.textContent = langDict[key]; });
+
+                ['#goal-type option', '#discipline-select option'].forEach(selector => {
+                    appViewWrapper.querySelectorAll(selector).forEach(opt => {
+                        const key = opt.dataset.lang;
+                        if (langDict[key]) opt.textContent = langDict[key];
+                    });
+                });
+                
                 updateLevelSliderText();
-                if (document.getElementById('plan-display').classList.contains('hidden')) document.getElementById('plan-title').textContent = langDict.your_training_plan;
+                if (!document.getElementById('plan-display').classList.contains('hidden')) {
+                     document.getElementById('plan-title').textContent = langDict.your_training_plan;
+                }
                 renderCalendar();
             }
 
@@ -489,37 +521,93 @@
                     const dayEl = document.createElement('div'); dayEl.textContent = i;
                     dayEl.className = 'p-2 cursor-pointer rounded-full hover:bg-blue-800 calendar-day';
                     const dayDate = new Date(year, month, i);
-                    if (dayDate < new Date().setHours(0,0,0,0)) dayEl.classList.add('text-gray-500', 'cursor-not-allowed');
-                    else dayEl.addEventListener('click', () => {
-                        document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
-                        selectedDate = dayDate; dayEl.classList.add('selected');
-                    });
+                    if (dayDate < new Date().setHours(0,0,0,0)) {
+                        dayEl.classList.add('text-gray-500', 'cursor-not-allowed');
+                    } else {
+                        dayEl.addEventListener('click', () => {
+                            document.querySelectorAll('.calendar-day.selected').forEach(d => d.classList.remove('selected'));
+                            selectedDate = dayDate; dayEl.classList.add('selected');
+                        });
+                    }
                     if (selectedDate && selectedDate.getTime() === dayDate.getTime()) dayEl.classList.add('selected');
                     calendarDaysEl.appendChild(dayEl);
                 }
             }
-
+            
             function generateTodayWorkout(fatigue, discipline, effort, duration) {
                 const langDict = translations[currentLang] || translations.es;
                 let workout = { title: '', description: '', warmup: '', mainSet: '', cooldown: '' };
-                const warmupTime = Math.max(10, Math.floor(duration * 0.20)); const cooldownTime = Math.max(5, Math.floor(duration * 0.15));
-                let mainSetTime = duration - warmupTime - cooldownTime; if (mainSetTime < 5) mainSetTime = 5;
-                workout.warmup = `${warmupTime} min.`; workout.cooldown = `${cooldownTime} min.`;
+
                 if (fatigue >= 8) {
-                    workout.title = langDict.recovery_session; workout.description = langDict.high_fatigue_warning;
-                    workout.mainSet = `${mainSetTime} min (RPE 2-3).`;
-                } else if (fatigue >= 6) {
-                    workout.title = langDict.easy_endurance_session; workout.mainSet = `${mainSetTime} min (RPE 4-5).`;
-                } else {
-                    if (effort <= 3) { workout.title = langDict.recovery_session; workout.mainSet = `${mainSetTime} min (RPE 3-4).`; }
-                    else if (effort <= 5) { workout.title = langDict.easy_endurance_session; workout.mainSet = `${mainSetTime} min (RPE 5-6).`; }
-                    else if (effort <= 7) {
-                        workout.title = langDict.tempo_session; const tempoTime = Math.max(10, Math.floor(mainSetTime * 0.6));
-                        workout.mainSet = `2 x ${Math.floor(tempoTime/2)} min (RPE 7-8), rec: 3-4 min.`;
-                    } else {
-                        workout.title = langDict.interval_session_short; const reps = Math.max(5, Math.floor(mainSetTime / 3));
-                        workout.mainSet = `${reps} x 90s (RPE 9), rec: 90s.`;
-                    }
+                    workout.title = langDict.recovery_session;
+                    workout.description = langDict.high_fatigue_warning;
+                    workout.warmup = "5-10 min";
+                    workout.mainSet = `${Math.max(15, duration - 15)} min (RPE 2-3).`;
+                    workout.cooldown = "5 min";
+                    return workout;
+                }
+                
+                const warmupTime = Math.max(10, Math.floor(duration * 0.20));
+                const cooldownTime = Math.max(5, Math.floor(duration * 0.15));
+                let mainSetTime = duration - warmupTime - cooldownTime;
+
+                workout.warmup = `${warmupTime} min. (RPE 2-4)`;
+                workout.cooldown = `${cooldownTime} min. (RPE 2-3)`;
+
+                switch (discipline) {
+                    case 'swim':
+                        const swimPaceFactor = 1.5 + (effort * 0.2);
+                        const estimatedMeters = Math.round((duration / swimPaceFactor) * 100 / 50) * 50;
+                        const wuMeters = Math.round(estimatedMeters * 0.20 / 50) * 50;
+                        const cdMeters = Math.round(estimatedMeters * 0.15 / 50) * 50;
+                        const mainSetMeters = estimatedMeters - wuMeters - cdMeters;
+
+                        workout.title = `${langDict.swimming}: ${estimatedMeters}m`;
+                        workout.warmup = `${wuMeters}m suave (crol, espalda, técnica)`;
+                        workout.cooldown = `${cdMeters}m muy suave, variado`;
+
+                        if (effort <= 4) {
+                            workout.mainSet = `${langDict.tech_swim}: ${mainSetMeters}m. <br> - 4x50m (25m pies / 25m crol) rec. 20s <br> - 4x50m (25m punto muerto / 25m crol) rec. 20s. <br> - Resto: Crol suave con Pull-buoy.`;
+                        } else if (effort <= 7) {
+                            const reps = Math.floor(mainSetMeters / 250);
+                            workout.mainSet = `${langDict.endurance_swim}: Pirámide. 50-100-150-100-50m (RPE 6-7) rec. 30s entre cada una. Repetir ${reps} veces.`;
+                        } else {
+                            const reps = Math.floor(mainSetMeters / 150);
+                            workout.mainSet = `${langDict.interval_run}: ${reps} x 100m (RPE 8-9) rec. 45s. <br> Tras cada serie, 50m suave.`;
+                        }
+                        break;
+
+                    case 'run':
+                        if (effort <= 3) {
+                            workout.title = langDict.recovery_session;
+                            workout.mainSet = `${mainSetTime} min (RPE 3-4).`;
+                        } else if (effort <= 5) {
+                            workout.title = langDict.fartlek_session;
+                            workout.mainSet = `${mainSetTime} min. alternando 5 min (RPE 5) con 2 min (RPE 6-7).`;
+                        } else if (effort <= 8) {
+                            workout.title = langDict.hill_session;
+                            const reps = Math.floor(mainSetTime / 5);
+                            workout.mainSet = `Encontrar una cuesta (5-8% incl.). ${reps} x 90s subiendo a (RPE 8), bajada al trote como recuperación.`;
+                        } else {
+                            workout.title = langDict.interval_session_short;
+                            const reps = Math.max(6, Math.floor(mainSetTime / 4));
+                            workout.mainSet = `${reps} x 400m (RPE 9) rec. 90s trote.`;
+                        }
+                        break;
+                    case 'bike':
+                        if (effort <= 4) {
+                            workout.title = langDict.easy_ride;
+                            workout.mainSet = `${mainSetTime} min (RPE 4-5) con alta cadencia (90-100rpm).`;
+                        } else if (effort <= 7) {
+                            workout.title = langDict.tempo_session;
+                            const blocks = Math.floor(mainSetTime / 15);
+                            workout.mainSet = `${blocks} x 10 min (RPE 7), rec. 5 min (RPE 3).`;
+                        } else {
+                            workout.title = langDict.interval_ride;
+                            const blocks = Math.floor(mainSetTime / 8);
+                            workout.mainSet = `${blocks} x 3 min (RPE 9) con alta cadencia (100-110rpm), rec. 5 min (RPE 3).`;
+                        }
+                        break;
                 }
                 return workout;
             }
@@ -534,48 +622,102 @@
                 return { racePace: formatPace(secondsPerKm), easyPace: formatPace(secondsPerKm + 75), tempoPace: formatPace(secondsPerKm + 20), intervalPace: formatPace(secondsPerKm - 15) };
             }
 
-            function getDetailedWorkout(dayIndex, weekPercent, goalType, level, langDict, paces) {
-                const levels = { beginner: 0, intermediate: 1, advanced: 2 }; const l = levels[level];
-                const isRace = goalType.includes('race') || goalType.includes('marathon'); const isTri = goalType.includes('tri');
+            // =====================================================================
+            // ========= NEW ADVANCED WORKOUT GENERATION LOGIC (LONG TERM) =========
+            // =====================================================================
+            
+            function getStrengthWorkout(weekNum, weekPercent, langDict) {
+                if (weekPercent < 0.6) { // Hypertrophy/Base Phase
+                    return weekNum % 2 === 1 ? langDict.strength_a : langDict.strength_b;
+                } else if (weekPercent < 0.85) { // Max Strength Phase
+                    return weekNum % 2 === 1 ? langDict.strength_c : langDict.strength_d;
+                } else { // Maintenance/Power Phase
+                    return langDict.strength_maintenance;
+                }
+            }
+
+            function getDetailedWorkout(weekNum, totalWeeks, dayIndex, goalType, level, langDict, paces) {
+                const levels = { beginner: 0, intermediate: 1, advanced: 2 };
+                const l = levels[level];
+                const isTri = goalType.includes('tri');
+                const weekPercent = weekNum / totalWeeks;
+
                 const getPaceText = (type) => paces ? `(~${paces[type]} ${langDict.pace_per_km})` : ``;
                 const wu = (mins) => `${langDict.warmup}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
                 const cd = (mins) => `${langDict.cooldown}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
+                
+                // --- BEGINNER ---
                 if (l === 0) {
-                    if (dayIndex === 1 || dayIndex === 5) return langDict.strength_training + ": 30-45 min (ej: sentadillas, zancadas, planchas).";
+                    if (dayIndex === 1 || dayIndex === 5) return getStrengthWorkout(weekNum, weekPercent, langDict);
                     if (dayIndex === 3) {
-                        const duration = 30 + Math.floor(weekPercent * 30); const runInterval = 8; const walkInterval = 2;
-                        const reps = Math.floor(duration / (runInterval + walkInterval));
-                        return `${langDict.walk_run_session}: ${reps}x (${runInterval}min ${langDict.running} / ${walkInterval}min ${langDict.walking}).`;
+                        const runInterval = 5 + Math.floor(weekPercent * 5);
+                        return `${langDict.walk_run_session}: 40 min - ${runInterval}min ${langDict.running} / 2min ${langDict.walking}.`;
                     }
-                    if (dayIndex === 6) {
-                        const duration = 45 + Math.floor(weekPercent * 45);
-                        if (weekPercent < 0.5) {
-                             const runInterval = 10; const walkInterval = 3; const reps = Math.floor(duration / (runInterval + walkInterval));
-                            return `${langDict.walk_run_session}: ${reps}x (${runInterval}min ${langDict.running} / ${walkInterval}min ${langDict.walking}).`;
-                        } else return `${langDict.easy_run}: ${duration}min ${getPaceText('easyPace')}.`;
-                    }
+                    if (dayIndex === 6) { return `${langDict.long_run}: ${45 + Math.floor(weekPercent * 60)} min continuos.`; }
                     return langDict.rest_day;
                 }
-                if (dayIndex === 2) { const reps = [4, 6, 8][l]; const rec = ['400m', '400m', '200m'][l]; const dist = (isRace && goalType.includes('10k')) ? '400m' : '800m'; return `${wu(15)}. ${langDict.main_set}: ${reps} x ${dist} ${getPaceText('intervalPace')} (rec: ${rec}). ${cd(10)}`; }
-                if (dayIndex === 4) {
-                     if (isTri) { const reps = [3, 5, 7][l]; const duration = [5, 8, 10][l]; return `${langDict.interval_ride}: ${reps} x ${duration}min.`; }
-                     else { const duration = [20, 30, 40][l]; const blocks = l > 0 ? `2x${duration/2}min` : `${duration}min`; return `${wu(15)}. ${langDict.main_set}: ${blocks} ${getPaceText('tempoPace')}. ${cd(10)}`; }
-                }
-                if (dayIndex === 0) {
-                    const baseKm = { 'race_10k': 8, 'half-marathon': 12, 'marathon': 16, 'tri-sprint': 5, 'tri-olympic': 8, 'tri-md': 10, 'tri-ld': 14 };
-                    const peakKm = { 'race_10k': 12, 'half-marathon': 20, 'marathon': 32, 'tri-sprint': 10, 'tri-olympic': 15, 'tri-md': 21, 'tri-ld': 25 };
-                    const dist = Math.round(baseKm[goalType] + (peakKm[goalType] - baseKm[goalType]) * weekPercent);
-                    return `${langDict.long_run}: ${dist}km ${getPaceText('easyPace')}`;
-                }
-                if (isTri) {
-                    if (dayIndex === 1) return `${langDict.endurance_swim}: ${[1500, 2000, 2500][l]}m.`;
-                    if (dayIndex === 5) return `${langDict.brick_workout}: 45min ${langDict.easy_ride} + 20min ${langDict.easy_run}.`;
-                }
-                if (isRace) {
-                     if (dayIndex === 1 || dayIndex === 5) {
-                        if (dayIndex === 1 && l > 0) return `${langDict.strength_training}: 45-60 min (ej: peso muerto, press, dominadas).`;
-                        return `${langDict.easy_run}: ${[30, 45, 50][l]}min ${getPaceText('easyPace')}.`;
-                     }
+                
+                // --- INTERMEDIATE & ADVANCED ---
+                const workoutType = {
+                    0: isTri ? 'easy_ride' : 'rest_day', 1: 'strength', 2: 'quality1',
+                    3: 'easy_run', 4: 'quality2', 5: 'strength', 6: 'long_run_brick'
+                }[dayIndex];
+
+                switch(workoutType) {
+                    case 'strength':
+                        return getStrengthWorkout(weekNum, weekPercent, langDict);
+
+                    case 'quality1': // Main Quality 1 (e.g., VO2 Max focus)
+                        const q1Rotation = weekNum % 3;
+                        if (isTri) { // Swim focus
+                            const totalMeters = 1800 + Math.floor(weekPercent * 1200);
+                            if (q1Rotation === 1) return `${langDict.interval_run} (natación): ${totalMeters}m. Principal: ${8 + Math.floor(weekPercent * 8)}x100m (RPE 8-9) rec 45s.`;
+                            if (q1Rotation === 2) return `${langDict.tech_swim}: ${totalMeters}m. Principal: 4x(200m crol + 100m técnica) rec 30s.`;
+                            return `${langDict.endurance_swim}: ${totalMeters}m. Principal: 3x500m (RPE 7) rec 60s.`;
+                        } else { // Run focus
+                            if (q1Rotation === 1) return `${wu(15)}. ${langDict.interval_session_short}: ${6 + Math.floor(weekPercent * 6)} x 400m ${getPaceText('intervalPace')} (rec: 90s trote). ${cd(10)}`;
+                            if (q1Rotation === 2) return `${wu(15)}. ${langDict.hill_session}: ${6 + Math.floor(weekPercent * 4)} x 3min en cuesta (RPE 8-9). ${cd(10)}`;
+                            return `${wu(15)}. ${langDict.interval_session_long}: ${3 + Math.floor(weekPercent * 3)} x 1000m a ritmo 10k (rec 400m trote). ${cd(10)}`;
+                        }
+                    
+                    case 'quality2': // Main Quality 2 (e.g., Threshold focus)
+                        if (isTri) { // Bike focus
+                            const bikeDur = 60 + Math.floor(weekPercent * 45);
+                            const tempoBlocks = 2 + Math.floor(weekPercent * 2);
+                            return `${langDict.tempo_session} (bici): ${bikeDur} min. Principal: ${tempoBlocks}x${10 + Math.floor(l/2)*5}min (RPE 8) rec 5min.`;
+                        } else { // Run focus
+                             const q2Rotation = weekNum % 3;
+                             if (q2Rotation === 1) return `${wu(15)}. ${langDict.tempo_session}: ${20 + Math.floor(weekPercent * 25)} min continuos ${getPaceText('tempoPace')}. ${cd(10)}`;
+                             if (q2Rotation === 2) return `${wu(15)}. ${langDict.fartlek_session}: ${40 + Math.floor(weekPercent * 20)} min (2 min rápido / 2 min suave). ${cd(10)}`;
+                             return `${wu(15)}. ${langDict.progressive_run_session}: ${50 + Math.floor(weekPercent * 20)} min, empezando suave y terminando rápido. ${cd(10)}`;
+                        }
+                    
+                    case 'long_run_brick':
+                        const longRotation = weekNum % 4;
+                        if (isTri) {
+                             const baseBike = { 'tri-sprint': 45, 'tri-olympic': 60, 'tri-md': 90, 'tri-ld': 120 };
+                             const peakBike = { 'tri-sprint': 90, 'tri-olympic': 140, 'tri-md': 200, 'tri-ld': 260 };
+                             const bikeTime = Math.round(baseBike[goalType] + (peakBike[goalType] - baseBike[goalType]) * weekPercent);
+                             const runKm = Math.round( (baseBike[goalType]/10) + weekPercent * 10);
+                             return `${langDict.brick_workout}: ${bikeTime} min Bici (RPE 5-6) + ${runKm} km Carrera (RPE 6-7).`;
+                        } else {
+                            const baseKm = { 'race_10k': 8, 'half-marathon': 12, 'marathon': 16 };
+                            const peakKm = { 'race_10k': 16, 'half-marathon': 25, 'marathon': 38 };
+                            let runDist = Math.round(baseKm[goalType] + (peakKm[goalType] - baseKm[goalType]) * weekPercent);
+                            if (longRotation === 2 && weekPercent > 0.3) {
+                                return `${langDict.long_run_quality_session}: ${runDist}km, últimos ${Math.max(2, Math.floor(runDist/4))}km a ritmo de carrera.`;
+                            }
+                            return `${langDict.long_run}: ${runDist}km ${getPaceText('easyPace')}`;
+                        }
+
+                    case 'easy_run':
+                        if(isTri) return `${langDict.easy_run}: ${40 + Math.floor(weekPercent * 20)} min`;
+                        return `${langDict.easy_run}: ${45 + Math.floor(weekPercent * 15)} min`;
+                    
+                    case 'easy_ride':
+                        return `${langDict.easy_ride}: ${60 + Math.floor(weekPercent * 60)} min`;
+
+                    case 'rest_day': return langDict.rest_day;
                 }
                 return langDict.rest_day;
             }
@@ -586,19 +728,37 @@
                 const minWeeks = { 'race_10k': 8, 'half-marathon': 10, 'marathon': 16, 'tri-sprint': 8, 'tri-olympic': 12, 'tri-md': 16, 'tri-ld': 20 };
                 if (weeksUntil < minWeeks[goalType]) { alert(langDict.error_min_weeks(minWeeks[goalType])); return null; }
                 const paces = calculatePaces(goalType, timeGoal); let plan = [];
+
+                const taperWeeks = (goalType === 'marathon' || goalType === 'tri-ld') ? 3 : 2;
+
                 for (let i = 0; i < weeksUntil; i++) {
-                    const weekNum = weeksUntil - i; const weekPercent = i / weeksUntil;
+                    const weekNum = i + 1;
+                    const weekNumFromEnd = weeksUntil - i;
+                    
                     let phase;
-                    if (weekNum <= 2) phase = langDict.taper; else if (weekNum <= 4 && (i + 1) % 4 === 0) phase = langDict.recovery;
-                    else if (weekPercent > 0.75) phase = langDict.peak; else if (weekPercent > 0.3) phase = langDict.build; else phase = langDict.base;
+                    if (weekNumFromEnd <= taperWeeks) phase = langDict.taper;
+                    else if (weekNum / weeksUntil > 0.65) phase = langDict.peak;
+                    else if (weekNum / weeksUntil > 0.2) phase = langDict.build;
+                    else phase = langDict.base;
+                    
                     let weeklyWorkouts = {};
                     for (let day = 0; day < 7; day++) {
                         const dayName = langDict.days_short[day];
-                        if (phase === langDict.taper) weeklyWorkouts[dayName] = (day % 2 !== 0) ? `${langDict.easy_run}: 20-30 min` : langDict.rest_day;
-                        else if (phase === langDict.recovery) weeklyWorkouts[dayName] = (day === 1 || day === 3 || day === 5) ? `${langDict.easy_run}: 30-40 min` : langDict.rest_day;
-                        else weeklyWorkouts[dayName] = getDetailedWorkout(day, weekPercent, goalType, level, langDict, paces);
+                        if (phase === langDict.taper) {
+                            const taperFactor = Math.max(0.4, (weekNumFromEnd - 1) / taperWeeks);
+                            let workout = getDetailedWorkout(weekNum, weeksUntil, day, goalType, level, langDict, paces);
+                            if(workout.startsWith(langDict.strength_training)) {
+                                weeklyWorkouts[dayName] = day === 1 ? langDict.strength_maintenance : langDict.rest_day; // Only one light session
+                            } else if (workout !== langDict.rest_day) {
+                                weeklyWorkouts[dayName] = `${langDict.taper}: ${workout.split('.')[0]}. Volumen Reducido (~${Math.round(taperFactor*100)}%). Mantener intensidad.`;
+                            } else {
+                                weeklyWorkouts[dayName] = workout;
+                            }
+                        } else {
+                            weeklyWorkouts[dayName] = getDetailedWorkout(weekNum, weeksUntil, day, goalType, level, langDict, paces);
+                        }
                     }
-                    plan.push({ week: i + 1, phase, workouts: weeklyWorkouts });
+                    plan.push({ week: weekNum, phase, workouts: weeklyWorkouts });
                 }
                 return plan;
             }
@@ -624,10 +784,9 @@
                 let html = '<div class="space-y-6">';
                 plan.forEach(week => {
                     html += `<div class="p-4 rounded-lg bg-blue-900/40"><div class="flex justify-between items-baseline mb-3"><h3 class="text-xl font-semibold text-amber-400">${langDict.week} ${week.week}</h3><span class="text-sm font-medium bg-amber-500/20 text-amber-300 px-2 py-1 rounded">${week.phase}</span></div><ul class="space-y-2 text-sm">`;
-                    const orderedDays = [langDict.days_short[1], langDict.days_short[2], langDict.days_short[3], langDict.days_short[4], langDict.days_short[5], langDict.days_short[6], langDict.days_short[0]];
+                    const orderedDays = [langDict.days_short[1], langDict.days_short[2], langDict.days_short[3], langDict.days_short[4], langDict.days_short[5], langDict.days_short[6], langDict.days_short[0]]; // Mon to Sun
                     orderedDays.forEach(day => {
-                        const originalDayIndex = langDict.days_short.indexOf(day);
-                        const workout = week.workouts[langDict.days_short[originalDayIndex]] || langDict.rest_day;
+                        const workout = week.workouts[day] || langDict.rest_day;
                         html += `<li class="flex border-b border-blue-800/50 py-2"><strong class="w-12">${day}:</strong><span>${workout}</span></li>`;
                     });
                     html += `</ul></div>`;
@@ -642,76 +801,80 @@
             document.getElementById('plan-long-term-card').addEventListener('click', () => navigateTo('long-term-planner'));
             document.getElementById('plan-today-card').addEventListener('click', () => navigateTo('today-planner'));
 
-            // Botones para volver al menú anterior
-            document.getElementById('back-btn').addEventListener('click', () => history.back());
-            document.getElementById('back-to-main-lt').addEventListener('click', () => history.back());
-            document.getElementById('back-to-main-tp').addEventListener('click', () => history.back());
+            ['back-btn', 'back-to-main-lt', 'back-to-main-tp'].forEach(id => {
+                document.getElementById(id).addEventListener('click', () => history.back());
+            });
 
-            // Controles del calendario
             document.getElementById('prev-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
             document.getElementById('next-month').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
             
-            // Sliders y inputs
             document.getElementById('fatigue-slider').addEventListener('input', (e) => { document.getElementById('fatigue-value').textContent = e.target.value; });
             document.getElementById('effort-slider').addEventListener('input', (e) => { document.getElementById('effort-value').textContent = e.target.value; });
             document.getElementById('level-slider').addEventListener('input', updateLevelSliderText);
             
             document.getElementById('goal-type').addEventListener('change', (e) => {
                 const timeGoalContainer = document.getElementById('time-goal-container');
-                if (['race_10k', 'half-marathon', 'marathon'].includes(e.target.value)) timeGoalContainer.classList.remove('hidden');
-                else timeGoalContainer.classList.add('hidden');
+                timeGoalContainer.classList.toggle('hidden', !['race_10k', 'half-marathon', 'marathon'].includes(e.target.value));
             });
 
-            // Botones de generación de planes
             document.getElementById('generate-today-plan-btn').addEventListener('click', () => {
                 loadingOverlay.classList.remove('hidden');
                 setTimeout(() => {
-                    const fatigue = parseInt(document.getElementById('fatigue-slider').value, 10); const discipline = document.getElementById('discipline-select').value;
-                    const effort = parseInt(document.getElementById('effort-slider').value, 10); const duration = parseInt(document.getElementById('duration-input').value, 10);
+                    const fatigue = parseInt(document.getElementById('fatigue-slider').value, 10);
+                    const discipline = document.getElementById('discipline-select').value;
+                    const effort = parseInt(document.getElementById('effort-slider').value, 10);
+                    const duration = parseInt(document.getElementById('duration-input').value, 10);
                     const workout = generateTodayWorkout(fatigue, discipline, effort, duration);
-                    displayWorkout(workout); loadingOverlay.classList.add('hidden');
+                    displayWorkout(workout);
+                    loadingOverlay.classList.add('hidden');
                 }, 1000);
             });
+
             document.getElementById('generate-long-term-plan-btn').addEventListener('click', () => {
-                if (!selectedDate || selectedDate < new Date().setHours(0,0,0,0)) { alert((translations[currentLang] || translations.es).error_past_date); return; }
+                if (!selectedDate || selectedDate < new Date().setHours(0,0,0,0)) {
+                    alert((translations[currentLang] || translations.es).error_past_date);
+                    return;
+                }
                 loadingOverlay.classList.remove('hidden');
                 setTimeout(() => {
-                    const goalType = document.getElementById('goal-type').value; const level = ['beginner', 'intermediate', 'advanced'][document.getElementById('level-slider').value];
+                    const goalType = document.getElementById('goal-type').value;
+                    const level = ['beginner', 'intermediate', 'advanced'][document.getElementById('level-slider').value];
                     let timeGoal = null;
-                    const timeGoalContainer = document.getElementById('time-goal-container');
-                    if (!timeGoalContainer.classList.contains('hidden')) {
-                        const h = parseInt(document.getElementById('goal-hours').value, 10) || 0; const m = parseInt(document.getElementById('goal-minutes').value, 10) || 0;
-                        const s = parseInt(document.getElementById('goal-seconds').value, 10) || 0;
-                        if(h > 0 || m > 0 || s > 0) timeGoal = { hours: h, minutes: m, seconds: s };
-                    }
+                    const h = parseInt(document.getElementById('goal-hours').value, 10) || 0;
+                    const m = parseInt(document.getElementById('goal-minutes').value, 10) || 0;
+                    const s = parseInt(document.getElementById('goal-seconds').value, 10) || 0;
+                    if(h > 0 || m > 0 || s > 0) timeGoal = { hours: h, minutes: m, seconds: s };
+                    
                     const plan = generateLongTermPlan(goalType, level, selectedDate, timeGoal);
                     if (plan) displayLongTermPlan(plan);
                     loadingOverlay.classList.add('hidden');
                 }, 1500);
             });
 
-            // Botón de descarga de PDF
             document.getElementById('download-pdf-btn').addEventListener('click', async () => {
-                const { jsPDF } = window.jspdf; const contentEl = document.getElementById('plan-content');
-                const wrapperEl = document.getElementById('plan-content-wrapper'); const planTitle = document.getElementById('plan-title').textContent;
-                const fileName = `${planTitle.replace(/ /g, '_')}.pdf`; loadingOverlay.classList.remove('hidden');
-                const originalMaxHeight = contentEl.style.maxHeight; const originalOverflowY = contentEl.style.overflowY;
-                contentEl.style.maxHeight = 'none'; contentEl.style.overflowY = 'visible';
-                await new Promise(resolve => setTimeout(resolve, 0));
+                const { jsPDF } = window.jspdf;
+                const contentEl = document.getElementById('plan-content');
+                const planTitle = document.getElementById('plan-title').textContent;
+                loadingOverlay.classList.remove('hidden');
+                
+                const originalMaxHeight = contentEl.style.maxHeight;
+                contentEl.style.maxHeight = 'none';
+                
                 try {
-                    const canvas = await html2canvas(wrapperEl, { scale: 2, useCORS: true, backgroundColor: '#1e3a8a' });
-                    const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF({ orientation: 'p', unit: 'px', format: [canvas.width, canvas.height] });
-                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height); pdf.save(fileName);
-                } catch (error) { console.error("Error generating PDF:", error); alert("Error generando PDF. Por favor, inténtalo de nuevo.");
+                    const canvas = await html2canvas(contentEl, { scale: 2, backgroundColor: '#0f172a' });
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF({ orientation: 'p', unit: 'px', format: [canvas.width, canvas.height] });
+                    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                    pdf.save(`${planTitle.replace(/ /g, '_')}.pdf`);
+                } catch (error) {
+                    console.error("Error generating PDF:", error);
+                    alert("Error generating PDF. Please try again.");
                 } finally {
-                    contentEl.style.maxHeight = originalMaxHeight; contentEl.style.overflowY = originalOverflowY;
+                    contentEl.style.maxHeight = originalMaxHeight;
                     loadingOverlay.classList.add('hidden');
                 }
             });
 
-            /**
-             * Inicializa la aplicación, determina qué vista mostrar y actualiza los textos.
-             */
             function initApp() {
                 const viewFromHash = window.location.hash.substring(1);
                 const validViews = ['main-menu', 'long-term-planner', 'today-planner', 'plan-display'];
@@ -724,10 +887,8 @@
                 document.getElementById('goal-type').dispatchEvent(new Event('change'));
             }
 
-            // Inicialización al cargar la página: siempre muestra la página de inicio.
             showLanding();
         });
     </script>
 </body>
 </html>
-
