@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cómo Funciona - Entrena.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-50 selection:bg-amber-500">
+
+    <!-- Navbar (Simplificado para no repetir código extenso, copiar del index) -->
+    <nav class="border-b border-slate-800 bg-slate-950 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-2xl text-white">entrena<span class="text-amber-400">.ai</span></a>
+            <a href="app.html" class="bg-amber-500 text-slate-900 px-4 py-2 rounded-full font-bold text-sm">Ir a la App</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-16">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center mb-16">La Ciencia detrás de la <span class="text-amber-400">IA</span></h1>
+
+        <!-- Step 1 -->
+        <div class="flex flex-col md:flex-row gap-8 items-center mb-20">
+            <div class="w-full md:w-1/2 bg-slate-800 p-8 rounded-2xl border border-slate-700">
+                <div class="text-6xl font-bold text-slate-700 mb-4">01</div>
+                <h3 class="text-2xl font-bold text-white mb-2">Periodización Inversa</h3>
+                <p class="text-slate-400">Empezamos por la fecha de tu carrera y trabajamos hacia atrás. La IA calcula exactamente cuándo debes hacer tus tiradas más largas y cuándo descansar.</p>
+            </div>
+            <div class="w-full md:w-1/2">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-2 rounded-full w-full mb-4"></div>
+                <div class="flex justify-between text-xs text-slate-500 font-mono uppercase">
+                    <span>Base</span><span>Build</span><span>Peak</span><span>Race</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex flex-col md:flex-row-reverse gap-8 items-center mb-20">
+            <div class="w-full md:w-1/2 bg-slate-800 p-8 rounded-2xl border border-slate-700">
+                <div class="text-6xl font-bold text-slate-700 mb-4">02</div>
+                <h3 class="text-2xl font-bold text-white mb-2">Regla del 80/20</h3>
+                <p class="text-slate-400">La mayoría de los planes fallan por exceso de intensidad. Nuestro algoritmo asegura que el 80% de tu entrenamiento sea aeróbico suave para construir base mitocondrial.</p>
+            </div>
+            <div class="w-full md:w-1/2 flex justify-center">
+                 <!-- Pie Chart Viz CSS -->
+                 <div class="w-48 h-48 rounded-full bg-slate-700 relative overflow-hidden border-4 border-slate-600">
+                     <div class="absolute top-0 right-0 w-full h-full bg-amber-500" style="clip-path: polygon(50% 50%, 100% 0, 100% 100%, 0 100%, 0 0);"></div>
+                     <div class="absolute top-0 left-0 w-full h-full bg-blue-500" style="clip-path: polygon(50% 50%, 0 0, 100% 0);"></div>
+                     <div class="absolute inset-0 flex items-center justify-center z-10">
+                         <div class="bg-slate-900 w-24 h-24 rounded-full flex items-center justify-center font-bold">80/20</div>
+                     </div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="text-center bg-gradient-to-r from-amber-500 to-orange-600 rounded-3xl p-12 shadow-2xl">
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">¿Listo para probarlo?</h2>
+            <p class="text-slate-900/80 mb-8 text-lg">No necesitas tarjeta de crédito ni registro.</p>
+            <a href="app.html" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold hover:scale-105 transition-transform inline-block">Generar mi Plan</a>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-950 py-8 text-center text-slate-600 text-sm border-t border-slate-800">
+        © 2025 Entrena.ai
+    </footer>
+</body>
+</html>

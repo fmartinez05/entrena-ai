@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursos y Guías - Entrena.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-50">
+
+    <nav class="border-b border-slate-800 bg-slate-950 p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-2xl text-white">entrena<span class="text-amber-400">.ai</span></a>
+            <div class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="index.html" class="text-slate-400 hover:text-white">Inicio</a>
+                <a href="app.html" class="text-amber-400">App</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="py-16 bg-slate-800 border-b border-slate-700">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-white mb-4">Centro de Conocimiento</h1>
+            <p class="text-xl text-slate-400">Guías sobre running, triatlón y fisiología.</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
+        
+        <!-- Article 1 -->
+        <article class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-amber-500/50 transition group">
+            <div class="h-48 bg-blue-900/50 relative">
+                <!-- Placeholder visual -->
+                <svg class="absolute inset-0 m-auto w-16 h-16 text-blue-500/50" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div class="p-6">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Running</span>
+                <h2 class="text-2xl font-bold text-white mt-2 mb-3 group-hover:text-amber-400 transition">Cómo preparar tu primer 10K</h2>
+                <p class="text-slate-400 mb-4 line-clamp-3">Pasar de 0 a 10km requiere paciencia. La clave no es correr rápido, sino correr frecuentemente. En esta guía desglosamos las 8 semanas clave...</p>
+                <a href="#" class="text-white font-semibold border-b border-amber-500 pb-1">Leer más</a>
+            </div>
+        </article>
+
+        <!-- Article 2 -->
+        <article class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 hover:border-amber-500/50 transition group">
+            <div class="h-48 bg-emerald-900/50 relative">
+                <svg class="absolute inset-0 m-auto w-16 h-16 text-emerald-500/50" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="p-6">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Nutrición</span>
+                <h2 class="text-2xl font-bold text-white mt-2 mb-3 group-hover:text-emerald-400 transition">Hidratación en Triatlón</h2>
+                <p class="text-slate-400 mb-4 line-clamp-3">¿Cuánto beber en la bici? ¿Geles o isotónico? Aprende a calcular tu tasa de sudoración y evita la temida 'pájara'.</p>
+                <a href="#" class="text-white font-semibold border-b border-emerald-500 pb-1">Leer más</a>
+            </div>
+        </article>
+
+        <!-- Article 3 (Content block directly for SEO) -->
+        <div class="col-span-1 md:col-span-2 mt-8 bg-slate-950 p-8 rounded-2xl border border-slate-800">
+            <h3 class="text-2xl font-bold text-white mb-4">Glosario Rápido</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <strong class="text-amber-400">RPE (Rate of Perceived Exertion)</strong>
+                    <p class="text-slate-400 text-sm mt-1">Escala del 1 al 10 para medir cuánto te cuesta un esfuerzo. 1 es sofá, 10 es sprint máximo.</p>
+                </div>
+                <div>
+                    <strong class="text-amber-400">Tapering</strong>
+                    <p class="text-slate-400 text-sm mt-1">Reducción estratégica del volumen de entrenamiento las semanas antes de la carrera para eliminar fatiga.</p>
+                </div>
+                <div>
+                    <strong class="text-amber-400">Brick (Transición)</strong>
+                    <p class="text-slate-400 text-sm mt-1">Entrenamiento donde combinas Bici + Correr inmediatamente para acostumbrar las piernas.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-950 py-8 text-center text-slate-600 text-sm border-t border-slate-800">
+        © 2025 Entrena.ai
+    </footer>
+</body>
+</html>

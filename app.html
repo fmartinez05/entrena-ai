@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrena.ai - Generador de Planes</title>
+    <meta name="robots" content="noindex">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { brand: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' } }
+                }
+            }
+        }
+    </script>
+
+    <!-- Librerías PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom Range Slider Styles */
+        input[type=range] {
+            -webkit-appearance: none; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px; width: 24px;
+            border-radius: 50%;
+            background: #f59e0b;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            background: #334155;
+            border-radius: 2px;
+        }
+        
+        /* Utilities */
+        .app-view { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .hidden-view { display: none !important; opacity: 0; transform: scale(0.98); }
+        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        
+        .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #f59e0b; border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-50 min-h-screen flex flex-col bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950">
+
+    <!-- Header App -->
+    <nav class="bg-slate-950/80 backdrop-blur border-b border-slate-800 p-4 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 hover:opacity-90 transition">
+                <div class="bg-brand-500 p-1.5 rounded-lg shadow-lg shadow-brand-500/20">
+                    <svg class="w-5 h-5 text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-white">entrena.ai</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="text-sm font-medium text-slate-400 hover:text-white transition hidden sm:block" data-i18n="back_home">Salir</a>
+                <div class="h-4 w-px bg-slate-700 hidden sm:block"></div>
+                <select id="lang-selector-app" class="bg-slate-900 border border-slate-700 text-xs font-medium rounded-lg px-2 py-1.5 text-slate-300 outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="es">ES</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main App Area -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 sm:p-6 relative w-full max-w-7xl mx-auto">
+        
+        <!-- View 1: App Menu (Selector) -->
+        <div id="view-menu" class="app-view w-full max-w-5xl animate-fade-in">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-extrabold text-white mb-3 tracking-tight" data-i18n="app_welcome">Hola, Atleta</h1>
+                <p class="text-lg text-slate-400" data-i18n="app_choose">¿Cuál es tu objetivo para hoy?</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 lg:gap-8">
+                <!-- Card Long Term -->
+                <button onclick="App.navigate('view-long-term')" class="glass-panel p-8 rounded-3xl hover:bg-slate-800 hover:border-brand-500/40 transition-all group text-left relative overflow-hidden h-full shadow-2xl">
+                    <div class="absolute -right-10 -top-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h2v2H8V8zm0 4h2v2H8v-2zm0 4h2v2H8v-2zm4-8h2v2h-2V8zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm4-8h2v2h-2V8zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors" data-i18n="btn_long_term_title">Objetivo a Largo Plazo</h2>
+                        <p class="text-slate-400 group-hover:text-slate-300 transition-colors" data-i18n="btn_long_term_desc">Prepara una Maratón, 10K o Triatlón. Genera un calendario completo por fases.</p>
+                        <div class="mt-auto pt-6 flex items-center text-sm font-bold text-blue-400 group-hover:translate-x-2 transition-transform">
+                            <span>Configurar Plan</span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                    </div>
+                </button>
+
+                <!-- Card Today -->
+                <button onclick="App.navigate('view-today')" class="glass-panel p-8 rounded-3xl hover:bg-slate-800 hover:border-brand-500/40 transition-all group text-left relative overflow-hidden h-full shadow-2xl">
+                    <div class="absolute -right-10 -top-10 p-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500">
+                        <svg class="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <div class="w-14 h-14 bg-brand-500/10 text-brand-400 rounded-2xl flex items-center justify-center mb-6 border border-brand-500/20 group-hover:scale-110 transition-transform">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-3 group-hover:text-brand-400 transition-colors" data-i18n="btn_today_title">Entrenamiento para Hoy</h2>
+                        <p class="text-slate-400 group-hover:text-slate-300 transition-colors" data-i18n="btn_today_desc">Genera una sesión única basada en tu energía y tiempo disponible ahora mismo.</p>
+                        <div class="mt-auto pt-6 flex items-center text-sm font-bold text-brand-400 group-hover:translate-x-2 transition-transform">
+                            <span>Crear Sesión</span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- View 2: Long Term Planner -->
+        <div id="view-long-term" class="app-view hidden-view w-full max-w-2xl">
+            <div class="flex items-center gap-4 mb-8">
+                <button onclick="App.navigate('view-menu')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-colors border border-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <h2 class="text-2xl font-bold text-white" data-i18n="title_long_term">Configurar Plan</h2>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-8">
+                <!-- Step 1: Goal -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_goal">Objetivo Principal</label>
+                    <div class="relative">
+                        <select id="lt-goal" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none appearance-none transition-shadow cursor-pointer hover:bg-slate-800">
+                            <option value="race_10k" data-i18n="race_10k">10K Run</option>
+                            <option value="half-marathon" data-i18n="half_marathon">Media Maratón (21k)</option>
+                            <option value="marathon" data-i18n="marathon">Maratón (42k)</option>
+                            <option value="tri-sprint" data-i18n="tri_sprint">Triatlón Sprint</option>
+                            <option value="tri-olympic" data-i18n="tri_olympic">Triatlón Olímpico</option>
+                            <option value="tri-md" data-i18n="tri_md">Triatlón Media Distancia</option>
+                            <option value="tri-ld" data-i18n="tri_ld">Triatlón Larga Distancia</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Level -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_level">Nivel Actual</label>
+                        <span id="lt-level-text" class="text-brand-400 font-bold text-sm bg-brand-900/20 px-3 py-1 rounded-full border border-brand-500/20">Iniciación</span>
+                    </div>
+                    <div class="relative pt-2">
+                        <input type="range" id="lt-level" min="0" max="2" step="1" value="0" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-slate-500 mt-2 font-medium">
+                            <span>Novato</span>
+                            <span>Intermedio</span>
+                            <span>Pro</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Step 3: Date -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_date">Fecha de la Carrera</label>
+                        <input type="date" id="lt-date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-white scheme-dark focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-shadow">
+                        <p class="text-xs text-slate-500" data-i18n="msg_date_min">Selecciona una fecha futura.</p>
+                    </div>
+
+                    <!-- Step 4: Time Goal -->
+                    <div id="time-goal-wrapper" class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_time_goal">Tiempo Objetivo (Opcional)</label>
+                        <div class="flex gap-2">
+                            <input type="number" id="lt-h" placeholder="HH" class="w-1/3 bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 outline-none">
+                            <input type="number" id="lt-m" placeholder="MM" class="w-1/3 bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 outline-none">
+                            <input type="number" id="lt-s" placeholder="SS" class="w-1/3 bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center text-white placeholder-slate-600 focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="App.generateLongTerm()" class="w-full bg-brand-500 hover:bg-brand-400 text-slate-950 text-lg font-bold py-4 rounded-xl transition-all shadow-xl shadow-brand-500/20 hover:shadow-brand-500/30 hover:-translate-y-0.5 flex justify-center items-center gap-2" data-i18n="btn_generate">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Generar Plan Completo
+                </button>
+            </div>
+        </div>
+
+        <!-- View 3: Today Planner -->
+        <div id="view-today" class="app-view hidden-view w-full max-w-xl">
+             <div class="flex items-center gap-4 mb-8">
+                <button onclick="App.navigate('view-menu')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-colors border border-slate-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+                <h2 class="text-2xl font-bold text-white" data-i18n="title_today">Sesión para Hoy</h2>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-8">
+                <!-- Discipline -->
+                <div class="space-y-3">
+                    <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_discipline">Disciplina</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="App.selectDiscipline('run')" class="disc-btn relative overflow-hidden group bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl p-4 transition-all duration-200 active ring-2 ring-brand-500 bg-slate-800" data-val="run">
+                            <span class="relative z-10 font-bold text-sm" data-i18n="running">Run</span>
+                            <div class="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </button>
+                        <button onclick="App.selectDiscipline('bike')" class="disc-btn relative overflow-hidden group bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl p-4 transition-all duration-200" data-val="bike">
+                             <span class="relative z-10 font-bold text-sm" data-i18n="cycling">Bike</span>
+                             <div class="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </button>
+                        <button onclick="App.selectDiscipline('swim')" class="disc-btn relative overflow-hidden group bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl p-4 transition-all duration-200" data-val="swim">
+                             <span class="relative z-10 font-bold text-sm" data-i18n="swimming">Swim</span>
+                             <div class="absolute inset-0 bg-brand-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fatigue -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_fatigue">Fatiga (1-10)</label>
+                        <span id="td-fatigue-text" class="text-brand-400 font-bold text-xl">5</span>
+                    </div>
+                    <input type="range" id="td-fatigue" min="1" max="10" value="5" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between text-xs text-slate-500 font-medium">
+                        <span>Fresco</span>
+                        <span>Normal</span>
+                        <span>Agotado</span>
+                    </div>
+                </div>
+
+                 <!-- Effort -->
+                 <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_effort">Nivel de Exigencia (1-10)</label>
+                        <span id="td-effort-text" class="text-brand-400 font-bold text-xl">5</span>
+                    </div>
+                    <input type="range" id="td-effort" min="1" max="10" value="5" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <!-- Duration -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-semibold text-slate-300" data-i18n="lbl_duration">Tiempo disponible (min)</label>
+                    <input type="number" id="td-duration" value="60" step="5" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 text-white font-mono text-lg focus:ring-2 focus:ring-brand-500 outline-none">
+                </div>
+
+                <button onclick="App.generateToday()" class="w-full bg-brand-500 hover:bg-brand-400 text-slate-950 text-lg font-bold py-4 rounded-xl transition-all shadow-xl shadow-brand-500/20 hover:shadow-brand-500/30 hover:-translate-y-0.5 flex justify-center items-center gap-2" data-i18n="btn_generate_session">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    Generar Entrenamiento
+                </button>
+            </div>
+        </div>
+
+        <!-- View 4: Results -->
+        <div id="view-result" class="app-view hidden-view w-full max-w-4xl h-full flex flex-col">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="App.navigate('view-menu')" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 flex items-center gap-2 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span data-i18n="btn_close">Cerrar</span>
+                </button>
+                <button onclick="App.downloadPDF()" class="bg-slate-800 hover:bg-slate-700 text-brand-400 hover:text-brand-300 px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-slate-700 shadow-lg transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    PDF
+                </button>
+            </div>
+            
+            <!-- Content Container -->
+            <div id="result-container" class="bg-slate-900 p-6 sm:p-10 rounded-3xl border border-slate-800 shadow-2xl overflow-y-auto max-h-[80vh] custom-scrollbar">
+                <!-- Dynamic Content Goes Here -->
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="loader" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center transition-opacity duration-300">
+            <div class="text-center">
+                <div class="loader mx-auto mb-6"></div>
+                <p class="text-slate-300 font-medium animate-pulse" data-i18n="msg_generating">Diseñando tu plan perfecto...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- LÓGICA EXACTA MANTENIDA -->
+    <script>
+        // --- 1. DICTIONARY (MERGED: UI + ORIGINAL LOGIC) ---
+        const dictionary = {
+            es: {
+                // UI Marketing/App Shell
+                back_home: "Salir", app_welcome: "Hola, Atleta", app_choose: "¿Qué quieres entrenar hoy?",
+                btn_long_term_title: "Objetivo a Largo Plazo", btn_long_term_desc: "Prepara una carrera o triatlón.",
+                btn_today_title: "Entrenamiento para Hoy", btn_today_desc: "Sesión única según tu estado.",
+                title_long_term: "Configurar Plan", lbl_goal: "Objetivo", lbl_level: "Nivel", lbl_date: "Fecha Carrera",
+                lbl_time_goal: "Tiempo Objetivo (Opcional)", msg_date_min: "Elige una fecha futura razonable.",
+                btn_generate: "Generar Plan", title_today: "Sesión para Hoy", lbl_discipline: "Disciplina",
+                lbl_fatigue: "Fatiga (1-10)", lbl_effort: "Exigencia (1-10)", lbl_duration: "Minutos", btn_generate_session: "Generar Sesión",
+                btn_close: "Cerrar", msg_generating: "Analizando datos...",
+
+                // Original Logic Texts
+                running: "Carrera", cycling: "Ciclismo", swimming: "Natación", race_10k: "Carrera 10 Km",
+                half_marathon: "Media Maratón", marathon: "Maratón", tri_sprint: "Triatlón Sprint", tri_olympic: "Triatlón Olímpico", tri_md: "Triatlón Media Distancia",
+                tri_ld: "Triatlón Larga Distancia", beginner: "Iniciación", intermediate: "Medio", advanced: "Alto", week: "Semana", phase: "Fase", base: "Base",
+                build: "Construcción", peak: "Pico", taper: "Puesta a punto", recovery: "Recuperación", rest_day: "Día de Descanso", long_run: "Tirada Larga",
+                tempo_run: "Carrera a Ritmo (Tempo)", interval_run: "Series (Intervalos)", easy_run: "Carrera Suave", long_ride: "Rodaje Largo",
+                interval_ride: "Series en Bici", easy_ride: "Rodaje Suave", brick_workout: "Entrenamiento Ladrillo (Bici + Carrera)",
+                tech_swim: "Técnica de Natación", endurance_swim: "Natación de Resistencia", days_short: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"], error_past_date: "Por favor, selecciona una fecha futura.",
+                error_min_weeks: (weeks) => `Se necesitan al menos ${weeks} semanas para un plan efectivo.`, workout_for_today: "Entrenamiento para Hoy",
+                warmup: "Calentamiento", main_set: "Parte Principal", cooldown: "Vuelta a la Calma", rpe_explanation: "Nota: RPE (Tasa de Esfuerzo Percibido) es una escala de 1 (muy fácil) a 10 (esfuerzo máximo) para medir la intensidad que sientes.",
+                recovery_session: "Sesión de Recuperación", high_fatigue_warning: "Fatigue alta. Se recomienda una sesión muy suave o descanso.",
+                long_run_quality_session: "Tirada Larga con Calidad", interval_session_short: "Sesión de Series Cortas", interval_session_long: "Sesión de Series Largas",
+                hill_session: "Sesión de Cuestas", fartlek_session: "Sesión de Fartlek (Cambios de Ritmo)", tempo_session: "Sesión de Ritmo Controlado (Tempo)",
+                progressive_run_session: "Rodaje Progresivo", pace_per_km: "ritmo/km", strength_training: "Entrenamiento de Fuerza", walk_run_session: "Sesión Caminar-Correr", walking: "caminando",
+                strength_a: "Fuerza (A): 3x10 Sentadilla Goblet, 3x12 Zancadas, 3x10 Press Banca, 3x12 Remo c/m, 3x45s Plancha.",
+                strength_b: "Fuerza (B): 3x10 Peso Muerto Rumano, 3x12 Puente de Glúteos, 3x10 Press Militar, 3xMax Dominadas, 3x45s Plancha Lateral.",
+                strength_c: "Fuerza (C): 5x5 Sentadilla Trasera, 3x8 Peso Muerto una pierna, 3x8 Press inclinado, 3x10 Remo en polea.",
+                strength_d: "Fuerza (D): 5x5 Peso Muerto Convencional, 3x8 Zancada Búlgara, 5x5 Press Militar, 3x10 Remo Pendlay.",
+                strength_maintenance: "Mantenimiento: 2x15 Saltos al cajón, 2x15 Balanceo Kettlebell, 2x15 Lanzamiento Balón Medicinal, 2x15 Flexiones pliométricas."
+            },
+            en: {
+                back_home: "Exit", app_welcome: "Hi, Athlete", app_choose: "What are we training today?",
+                btn_long_term_title: "Long Term Goal", btn_long_term_desc: "Prep for a race or triathlon.",
+                btn_today_title: "Workout for Today", btn_today_desc: "Single session based on status.",
+                title_long_term: "Setup Plan", lbl_goal: "Goal", lbl_level: "Level", lbl_date: "Race Date",
+                lbl_time_goal: "Time Goal (Optional)", msg_date_min: "Choose a reasonable future date.",
+                btn_generate: "Generate Plan", title_today: "Today's Session", lbl_discipline: "Discipline",
+                lbl_fatigue: "Fatigue (1-10)", lbl_effort: "Effort (1-10)", lbl_duration: "Minutes", btn_generate_session: "Generate Session",
+                btn_close: "Close", msg_generating: "Analyzing data...",
+                
+                running: "Running", cycling: "Cycling", swimming: "Swimming", race_10k: "10k Race",
+                half_marathon: "Half Marathon", marathon: "Marathon", tri_sprint: "Sprint Triathlon", tri_olympic: "Olympic Triathlon", tri_md: "Middle Distance Triathlon",
+                tri_ld: "Long Distance Triathlon", beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced", week: "Week", phase: "Phase", base: "Base",
+                build: "Build", peak: "Peak", taper: "Taper", recovery: "Recovery", rest_day: "Rest Day", long_run: "Long Run",
+                tempo_run: "Tempo Run", interval_run: "Intervals", easy_run: "Easy Run", long_ride: "Long Ride",
+                interval_ride: "Bike Intervals", easy_ride: "Easy Ride", brick_workout: "Brick Workout (Bike + Run)",
+                tech_swim: "Swim Technique", endurance_swim: "Endurance Swim",
+                days_short: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], error_past_date: "Please select a future date.",
+                error_min_weeks: (weeks) => `At least ${weeks} weeks are needed for an effective plan.`, workout_for_today: "Workout for Today",
+                warmup: "Warm-up", main_set: "Main Set", cooldown: "Cool-down", rpe_explanation: "Note: RPE (Rate of Perceived Exertion) is a scale from 1 (very easy) to 10 (maximum effort) to measure how hard you feel you are working.",
+                recovery_session: "Recovery Session", high_fatigue_warning: "High fatigue. A very light session or rest is recommended.",
+                long_run_quality_session: "Quality Long Run", interval_session_short: "Short Interval Session", interval_session_long: "Long Interval Session",
+                hill_session: "Hill Session", fartlek_session: "Fartlek Session (Pace Changes)", tempo_session: "Tempo Session",
+                progressive_run_session: "Progressive Run", pace_per_km: "pace/km", strength_training: "Strength Training", walk_run_session: "Walk-Run Session", walking: "walking",
+                strength_a: "Strength (A): 3x10 Goblet Squat, 3x12 Lunges, 3x10 Bench Press, 3x12 DB Row, 3x45s Plank.",
+                strength_b: "Strength (B): 3x10 Romanian Deadlift, 3x12 Glute Bridge, 3x10 Military Press, 3xMax Pull-ups, 3x45s Side Plank.",
+                strength_c: "Strength (C): 5x5 Back Squat, 3x8 Single Leg RDL, 3x8 Incline Press, 3x10 Seated Row.",
+                strength_d: "Strength (D): 5x5 Conventional Deadlift, 3x8 Bulgarian Split Squat, 5x5 Military Press, 3x10 Pendlay Row.",
+                strength_maintenance: "Maintenance: 2x15 Box Jumps, 2x15 Kettlebell Swings, 2x15 Med Ball Slams, 2x15 Plyo Push-ups."
+            },
+            fr: {
+                back_home: "Quitter", app_welcome: "Bonjour, Athlète", app_choose: "On s'entraîne à quoi ?",
+                btn_long_term_title: "Objectif Long Terme", btn_long_term_desc: "Marathon, 10K ou Triathlon.",
+                btn_today_title: "Entraînement du Jour", btn_today_desc: "Séance unique selon votre état.",
+                title_long_term: "Configurer Plan", lbl_goal: "Objectif", lbl_level: "Niveau", lbl_date: "Date Course",
+                lbl_time_goal: "Objectif Temps (Optionnel)", msg_date_min: "Choisissez une date future.",
+                btn_generate: "Générer Plan", title_today: "Séance du Jour", lbl_discipline: "Discipline",
+                lbl_fatigue: "Fatigue (1-10)", lbl_effort: "Effort (1-10)", lbl_duration: "Minutes", btn_generate_session: "Générer Séance",
+                btn_close: "Fermer", msg_generating: "Analyse...",
+                
+                running: "Course à pied", cycling: "Vélo", swimming: "Natation", race_10k: "Course 10 Km",
+                half_marathon: "Semi-Marathon", marathon: "Marathon", tri_sprint: "Triathlon Sprint", tri_olympic: "Triathlon Olympique", tri_md: "Triathlon Moyenne Distance",
+                tri_ld: "Triathlon Longue Distance", beginner: "Débutant", intermediate: "Intermédiaire", advanced: "Avancé", week: "Semaine", phase: "Phase", base: "Base",
+                build: "Construction", peak: "Pic", taper: "Affûtage", recovery: "Récupération", rest_day: "Jour de Repos", long_run: "Sortie Longue",
+                tempo_run: "Course au Seuil (Tempo)", interval_run: "Fractionné (Intervalles)", easy_run: "Course Lente", long_ride: "Sortie Longue Vélo",
+                interval_ride: "Fractionné Vélo", easy_ride: "Sortie Vélo Tranquille", brick_workout: "Enchaînement (Vélo + Course)",
+                tech_swim: "Technique de Nage", endurance_swim: "Endurance Natation",
+                days_short: ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"], error_past_date: "Veuillez sélectionner une date future.",
+                error_min_weeks: (weeks) => `Un minimum de ${weeks} semaines est nécessaire pour un plan efficace.`, workout_for_today: "Entraînement du Jour",
+                warmup: "Échauffement", main_set: "Corps de Séance", cooldown: "Retour au Calme", rpe_explanation: "Note : Le RPE (Échelle de Perception de l'Effort) est une échelle de 1 (très facile) à 10 (effort maximal) pour mesurer l'intensité ressentie.",
+                recovery_session: "Session de Récupération", high_fatigue_warning: "Fatigue élevée. Une session très légère ou du repos est recommandé.",
+                long_run_quality_session: "Sortie Longue de Qualité", interval_session_short: "Session d'Intervalles Courts", interval_session_long: "Session d'Intervalles Longs",
+                hill_session: "Session en Côte", fartlek_session: "Session de Fartlek (Changements d'Allure)", tempo_session: "Session au Seuil (Tempo)",
+                progressive_run_session: "Course Progressive", pace_per_km: "allure/km", strength_training: "Musculation", walk_run_session: "Session Marche-Course", walking: "en marchant",
+                strength_a: "Musculation (A): 3x10 Goblet Squat, 3x12 Fentes, 3x10 Développé couché, 3x12 Rowing haltère, 3x45s Planche.",
+                strength_b: "Musculation (B): 3x10 Soulevé de terre roumain, 3x12 Pont fessier, 3x10 Développé militaire, 3xMax Tractions, 3x45s Planche latérale.",
+                strength_c: "Musculation (C): 5x5 Squat arrière, 3x8 Soulevé de terre unipodal, 3x8 Développé incliné, 3x10 Rowing assis.",
+                strength_d: "Musculation (D): 5x5 Soulevé de terre conventionnel, 3x8 Fente bulgare, 5x5 Développé militaire, 3x10 Rowing Pendlay.",
+                strength_maintenance: "Maintien: 2x15 Sauts sur boîte, 2x15 Kettlebell Swing, 2x15 Lancer de Medecine Ball, 2x15 Pompes pliométriques."
+            }
+        };
+
+        // --- 2. CORE LOGIC (IMPORTED FROM ORIGINAL) ---
+
+        function generateTodayWorkout(fatigue, discipline, effort, duration, lang) {
+            const langDict = dictionary[lang];
+            let workout = { title: '', description: '', warmup: '', mainSet: '', cooldown: '' };
+            
+            if (fatigue >= 8) {
+                workout.title = langDict.recovery_session;
+                workout.description = langDict.high_fatigue_warning;
+                workout.warmup = "5-10 min";
+                workout.mainSet = `${Math.max(15, duration - 15)} min (RPE 2-3).`;
+                workout.cooldown = "5 min";
+                return workout;
+            }
+            
+            const warmupTime = Math.max(10, Math.floor(duration * 0.20));
+            const cooldownTime = Math.max(5, Math.floor(duration * 0.15));
+            let mainSetTime = duration - warmupTime - cooldownTime;
+            
+            workout.warmup = `${warmupTime} min. (RPE 2-4)`;
+            workout.cooldown = `${cooldownTime} min. (RPE 2-3)`;
+            
+            switch (discipline) {
+                case 'swim':
+                    const swimPaceFactor = 1.5 + (effort * 0.2);
+                    const estimatedMeters = Math.round((duration / swimPaceFactor) * 100 / 50) * 50;
+                    const wuMeters = Math.round(estimatedMeters * 0.20 / 50) * 50;
+                    const cdMeters = Math.round(estimatedMeters * 0.15 / 50) * 50;
+                    const mainSetMeters = estimatedMeters - wuMeters - cdMeters;
+                    workout.title = `${langDict.swimming}: ${estimatedMeters}m`;
+                    workout.warmup = `${wuMeters}m suave (crol, espalda, técnica)`;
+                    workout.cooldown = `${cdMeters}m muy suave, variado`;
+                    if (effort <= 4) {
+                        workout.mainSet = `${langDict.tech_swim}: ${mainSetMeters}m. <br> - 4x50m (25m pies / 25m crol) rec. 20s <br> - 4x50m (25m punto muerto / 25m crol) rec. 20s. <br> - Resto: Crol suave con Pull-buoy.`;
+                    } else if (effort <= 7) {
+                        const reps = Math.floor(mainSetMeters / 250);
+                        workout.mainSet = `${langDict.endurance_swim}: Pirámide. 50-100-150-100-50m (RPE 6-7) rec. 30s entre cada una. Repetir ${reps} veces.`;
+                    } else {
+                        const reps = Math.floor(mainSetMeters / 150);
+                        workout.mainSet = `${langDict.interval_run}: ${reps} x 100m (RPE 8-9) rec. 45s. <br> Tras cada serie, 50m suave.`;
+                    }
+                    break;
+                case 'run':
+                    if (effort <= 3) {
+                        workout.title = langDict.recovery_session;
+                        workout.mainSet = `${mainSetTime} min (RPE 3-4).`;
+                    } else if (effort <= 5) {
+                        workout.title = langDict.fartlek_session;
+                        workout.mainSet = `${mainSetTime} min. alternando 5 min (RPE 5) con 2 min (RPE 6-7).`;
+                    } else if (effort <= 8) {
+                        workout.title = langDict.hill_session;
+                        const reps = Math.floor(mainSetTime / 5);
+                        workout.mainSet = `Encontrar una cuesta (5-8% incl.). ${reps} x 90s subiendo a (RPE 8), bajada al trote como recuperación.`;
+                    } else {
+                        workout.title = langDict.interval_session_short;
+                        const reps = Math.max(6, Math.floor(mainSetTime / 4));
+                        workout.mainSet = `${reps} x 400m (RPE 9) rec. 90s trote.`;
+                    }
+                    break;
+                case 'bike':
+                    if (effort <= 4) {
+                        workout.title = langDict.easy_ride;
+                        workout.mainSet = `${mainSetTime} min (RPE 4-5) con alta cadencia (90-100rpm).`;
+                    } else if (effort <= 7) {
+                        workout.title = langDict.tempo_session;
+                        const blocks = Math.floor(mainSetTime / 15);
+                        workout.mainSet = `${blocks} x 10 min (RPE 7), rec. 5 min (RPE 3).`;
+                    } else {
+                        workout.title = langDict.interval_ride;
+                        const blocks = Math.floor(mainSetTime / 8);
+                        workout.mainSet = `${blocks} x 3 min (RPE 9) con alta cadencia (100-110rpm), rec. 5 min (RPE 3).`;
+                    }
+                    break;
+            }
+            return workout;
+        }
+
+        function calculatePaces(goalType, timeGoal) {
+            const distances = { 'race_10k': 10, 'half-marathon': 21.097, 'marathon': 42.195 };
+            if (!timeGoal || !distances[goalType]) return null;
+            const totalSeconds = (timeGoal.hours * 3600) + (timeGoal.minutes * 60) + timeGoal.seconds;
+            if (totalSeconds === 0) return null;
+            const secondsPerKm = totalSeconds / distances[goalType];
+            const formatPace = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+            return { racePace: formatPace(secondsPerKm), easyPace: formatPace(secondsPerKm + 75), tempoPace: formatPace(secondsPerKm + 20), intervalPace: formatPace(secondsPerKm - 15) };
+        }
+
+        function getStrengthWorkout(weekNum, weekPercent, langDict) {
+            if (weekPercent < 0.6) { 
+                return weekNum % 2 === 1 ? langDict.strength_a : langDict.strength_b;
+            } else if (weekPercent < 0.85) {
+                return weekNum % 2 === 1 ? langDict.strength_c : langDict.strength_d;
+            } else {
+                return langDict.strength_maintenance;
+            }
+        }
+
+        function getDetailedWorkout(weekNum, totalWeeks, dayIndex, goalType, level, langDict, paces) {
+            const levels = { beginner: 0, intermediate: 1, advanced: 2 };
+            const l = (typeof level === 'string') ? levels[level] : level; // Handle both string and int inputs
+            const isTri = goalType.includes('tri');
+            const weekPercent = weekNum / totalWeeks;
+            const getPaceText = (type) => paces ? `(~${paces[type]} ${langDict.pace_per_km})` : ``;
+            const wu = (mins) => `${langDict.warmup}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
+            const cd = (mins) => `${langDict.cooldown}: ${mins}min ${langDict.easy_run} ${getPaceText('easyPace')}`;
+            
+            if (l === 0) {
+                if (dayIndex === 1 || dayIndex === 5) return getStrengthWorkout(weekNum, weekPercent, langDict);
+                if (dayIndex === 3) {
+                    const runInterval = 5 + Math.floor(weekPercent * 5);
+                    return `${langDict.walk_run_session}: 40 min - ${runInterval}min ${langDict.running} / 2min ${langDict.walking}.`;
+                }
+                if (dayIndex === 6) { return `${langDict.long_run}: ${45 + Math.floor(weekPercent * 60)} min continuos.`; }
+                return langDict.rest_day;
+            }
+            
+            const workoutType = {
+                0: isTri ? 'easy_ride' : 'rest_day', 1: 'strength', 2: 'quality1',
+                3: 'easy_run', 4: 'quality2', 5: 'strength', 6: 'long_run_brick'
+            }[dayIndex];
+            
+            switch(workoutType) {
+                case 'strength':
+                    return getStrengthWorkout(weekNum, weekPercent, langDict);
+                case 'quality1':
+                    const q1Rotation = weekNum % 3;
+                    if (isTri) { 
+                        const totalMeters = 1800 + Math.floor(weekPercent * 1200);
+                        if (q1Rotation === 1) return `${langDict.interval_run} (natación): ${totalMeters}m. Principal: ${8 + Math.floor(weekPercent * 8)}x100m (RPE 8-9) rec 45s.`;
+                        if (q1Rotation === 2) return `${langDict.tech_swim}: ${totalMeters}m. Principal: 4x(200m crol + 100m técnica) rec 30s.`;
+                        return `${langDict.endurance_swim}: ${totalMeters}m. Principal: 3x500m (RPE 7) rec 60s.`;
+                    } else {
+                        if (q1Rotation === 1) return `${wu(15)}. ${langDict.interval_session_short}: ${6 + Math.floor(weekPercent * 6)} x 400m ${getPaceText('intervalPace')} (rec: 90s trote). ${cd(10)}`;
+                        if (q1Rotation === 2) return `${wu(15)}. ${langDict.hill_session}: ${6 + Math.floor(weekPercent * 4)} x 3min en cuesta (RPE 8-9). ${cd(10)}`;
+                        return `${wu(15)}. ${langDict.interval_session_long}: ${3 + Math.floor(weekPercent * 3)} x 1000m a ritmo 10k (rec 400m trote). ${cd(10)}`;
+                    }
+                case 'quality2':
+                    if (isTri) {
+                        const bikeDur = 60 + Math.floor(weekPercent * 45);
+                        const tempoBlocks = 2 + Math.floor(weekPercent * 2);
+                        return `${langDict.tempo_session} (bici): ${bikeDur} min. Principal: ${tempoBlocks}x${10 + Math.floor(l/2)*5}min (RPE 8) rec 5min.`;
+                    } else {
+                            const q2Rotation = weekNum % 3;
+                            if (q2Rotation === 1) return `${wu(15)}. ${langDict.tempo_session}: ${20 + Math.floor(weekPercent * 25)} min continuos ${getPaceText('tempoPace')}. ${cd(10)}`;
+                            if (q2Rotation === 2) return `${wu(15)}. ${langDict.fartlek_session}: ${40 + Math.floor(weekPercent * 20)} min (2 min rápido / 2 min suave). ${cd(10)}`;
+                            return `${wu(15)}. ${langDict.progressive_run_session}: ${50 + Math.floor(weekPercent * 20)} min, empezando suave y terminando rápido. ${cd(10)}`;
+                    }
+                case 'long_run_brick':
+                    const longRotation = weekNum % 4;
+                    if (isTri) {
+                            const baseBike = { 'tri-sprint': 45, 'tri-olympic': 60, 'tri-md': 90, 'tri-ld': 120 };
+                            const peakBike = { 'tri-sprint': 90, 'tri-olympic': 140, 'tri-md': 200, 'tri-ld': 260 };
+                            const bikeTime = Math.round(baseBike[goalType] + (peakBike[goalType] - baseBike[goalType]) * weekPercent);
+                            const runKm = Math.round( (baseBike[goalType]/10) + weekPercent * 10);
+                            return `${langDict.brick_workout}: ${bikeTime} min Bici (RPE 5-6) + ${runKm} km Carrera (RPE 6-7).`;
+                    } else {
+                        const baseKm = { 'race_10k': 8, 'half-marathon': 12, 'marathon': 16 };
+                        const peakKm = { 'race_10k': 16, 'half-marathon': 25, 'marathon': 38 };
+                        let runDist = Math.round(baseKm[goalType] + (peakKm[goalType] - baseKm[goalType]) * weekPercent);
+                        if (longRotation === 2 && weekPercent > 0.3) {
+                            return `${langDict.long_run_quality_session}: ${runDist}km, últimos ${Math.max(2, Math.floor(runDist/4))}km a ritmo de carrera.`;
+                        }
+                        return `${langDict.long_run}: ${runDist}km ${getPaceText('easyPace')}`;
+                    }
+                case 'easy_run':
+                    if(isTri) return `${langDict.easy_run}: ${40 + Math.floor(weekPercent * 20)} min`;
+                    return `${langDict.easy_run}: ${45 + Math.floor(weekPercent * 15)} min`;
+                case 'easy_ride':
+                    return `${langDict.easy_ride}: ${60 + Math.floor(weekPercent * 60)} min`;
+                case 'rest_day': return langDict.rest_day;
+            }
+            return langDict.rest_day;
+        }
+
+        function generateLongTermPlan(goalType, level, targetDate, timeGoal, lang) {
+            const langDict = dictionary[lang];
+            const today = new Date();
+            const weeksUntil = Math.floor((targetDate - today) / (1000 * 60 * 60 * 24 * 7));
+            const minWeeks = { 'race_10k': 8, 'half-marathon': 10, 'marathon': 16, 'tri-sprint': 8, 'tri-olympic': 12, 'tri-md': 16, 'tri-ld': 20 };
+            
+            if (weeksUntil < minWeeks[goalType]) { 
+                alert(langDict.error_min_weeks(minWeeks[goalType])); 
+                return null; 
+            }
+            
+            const paces = calculatePaces(goalType, timeGoal);
+            let plan = [];
+            const taperWeeks = (goalType === 'marathon' || goalType === 'tri-ld') ? 3 : 2;
+            
+            for (let i = 0; i < weeksUntil; i++) {
+                const weekNum = i + 1;
+                const weekNumFromEnd = weeksUntil - i;
+                let phase;
+                if (weekNumFromEnd <= taperWeeks) phase = langDict.taper;
+                else if (weekNum / weeksUntil > 0.65) phase = langDict.peak;
+                else if (weekNum / weeksUntil > 0.2) phase = langDict.build;
+                else phase = langDict.base;
+                
+                let weeklyWorkouts = {};
+                for (let day = 0; day < 7; day++) {
+                    const dayName = langDict.days_short[day];
+                    if (phase === langDict.taper) {
+                        const taperFactor = Math.max(0.4, (weekNumFromEnd - 1) / taperWeeks);
+                        let workout = getDetailedWorkout(weekNum, weeksUntil, day, goalType, level, langDict, paces);
+                        if(workout.startsWith(langDict.strength_training)) {
+                            weeklyWorkouts[dayName] = day === 1 ? langDict.strength_maintenance : langDict.rest_day;
+                        } else if (workout !== langDict.rest_day) {
+                            weeklyWorkouts[dayName] = `${langDict.taper}: ${workout.split('.')[0]}. Volumen Reducido (~${Math.round(taperFactor*100)}%). Mantener intensidad.`;
+                        } else {
+                            weeklyWorkouts[dayName] = workout;
+                        }
+                    } else {
+                        weeklyWorkouts[dayName] = getDetailedWorkout(weekNum, weeksUntil, day, goalType, level, langDict, paces);
+                    }
+                }
+                plan.push({ week: weekNum, phase, workouts: weeklyWorkouts });
+            }
+            return plan;
+        }
+
+
+        // --- 3. APP CONTROLLER ---
+        const App = {
+            lang: 'es',
+            currentDiscipline: 'run',
+
+            init: function() {
+                this.lang = localStorage.getItem('entrena_lang') || 'es';
+                document.getElementById('lang-selector-app').value = this.lang;
+                this.translate();
+                
+                // Listeners
+                document.getElementById('lang-selector-app').addEventListener('change', (e) => {
+                    this.lang = e.target.value;
+                    localStorage.setItem('entrena_lang', this.lang);
+                    this.translate();
+                });
+
+                // UI Sliders Labels
+                document.getElementById('lt-level').addEventListener('input', (e) => {
+                    const txt = this.lang === 'es' ? ['Iniciación', 'Intermedio', 'Avanzado'] : ['Beginner', 'Intermediate', 'Advanced'];
+                    document.getElementById('lt-level-text').textContent = txt[e.target.value];
+                });
+                document.getElementById('td-fatigue').addEventListener('input', (e) => {
+                    document.getElementById('td-fatigue-text').textContent = e.target.value;
+                });
+                document.getElementById('td-effort').addEventListener('input', (e) => {
+                    document.getElementById('td-effort-text').textContent = e.target.value;
+                });
+            },
+
+            translate: function() {
+                const t = dictionary[this.lang] || dictionary.es;
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    if(t[el.dataset.i18n]) el.textContent = t[el.dataset.i18n];
+                });
+                // Update sliders text
+                const lvl = document.getElementById('lt-level').value;
+                const txt = this.lang === 'es' ? ['Iniciación', 'Intermedio', 'Avanzado'] : ['Beginner', 'Intermediate', 'Advanced'];
+                document.getElementById('lt-level-text').textContent = txt[lvl];
+            },
+
+            navigate: function(viewId) {
+                document.querySelectorAll('.app-view').forEach(v => v.classList.add('hidden-view'));
+                document.getElementById(viewId).classList.remove('hidden-view');
+                window.scrollTo(0,0);
+            },
+
+            selectDiscipline: function(disc) {
+                this.currentDiscipline = disc;
+                document.querySelectorAll('.disc-btn').forEach(b => {
+                    b.classList.remove('ring-2', 'ring-brand-500', 'bg-slate-800');
+                    b.classList.add('bg-slate-900');
+                    if(b.dataset.val === disc) {
+                        b.classList.add('ring-2', 'ring-brand-500', 'bg-slate-800');
+                        b.classList.remove('bg-slate-900');
+                    }
+                });
+            },
+
+            // --- GENERATOR INTEGRATION ---
+            
+            generateToday: function() {
+                this.toggleLoader(true);
+                setTimeout(() => {
+                    const dur = parseInt(document.getElementById('td-duration').value);
+                    const fatigue = parseInt(document.getElementById('td-fatigue').value);
+                    const effort = parseInt(document.getElementById('td-effort').value);
+                    
+                    // CALL ORIGINAL LOGIC
+                    const workout = generateTodayWorkout(fatigue, this.currentDiscipline, effort, dur, this.lang);
+                    
+                    // RENDER
+                    const t = dictionary[this.lang];
+                    const html = `
+                        <h2 class="text-3xl font-bold text-brand-400 mb-2 tracking-tight">${workout.title}</h2>
+                        ${workout.description ? `<p class="mb-6 text-amber-200 bg-amber-900/20 p-4 rounded-xl border border-amber-500/20">${workout.description}</p>` : ''}
+                        <div class="flex flex-wrap gap-4 text-sm text-slate-400 mb-8 border-b border-slate-800 pb-6">
+                            <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 text-slate-300 font-semibold">${this.currentDiscipline.toUpperCase()}</span>
+                            <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 text-slate-300 font-semibold">${dur} min</span>
+                            <span class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 text-slate-300 font-semibold">Fatiga: ${fatigue}/10</span>
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="bg-slate-800/30 p-6 rounded-2xl border-l-4 border-green-500 hover:bg-slate-800/50 transition-colors">
+                                <h3 class="font-bold text-white text-lg mb-1">${t.warmup}</h3>
+                                <p class="text-slate-300 leading-relaxed">${workout.warmup}</p>
+                            </div>
+                            <div class="bg-slate-800/30 p-6 rounded-2xl border-l-4 border-brand-500 hover:bg-slate-800/50 transition-colors">
+                                <h3 class="font-bold text-white text-lg mb-1">${t.main_set}</h3>
+                                <p class="text-slate-300 leading-relaxed">${workout.mainSet}</p>
+                            </div>
+                            <div class="bg-slate-800/30 p-6 rounded-2xl border-l-4 border-blue-500 hover:bg-slate-800/50 transition-colors">
+                                <h3 class="font-bold text-white text-lg mb-1">${t.cooldown}</h3>
+                                <p class="text-slate-300 leading-relaxed">${workout.cooldown}</p>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-xs text-slate-500 italic text-center">${t.rpe_explanation}</div>
+                    `;
+                    
+                    document.getElementById('result-container').innerHTML = html;
+                    this.toggleLoader(false);
+                    this.navigate('view-result');
+                }, 800);
+            },
+
+            generateLongTerm: function() {
+                const dateVal = document.getElementById('lt-date').value;
+                const goal = document.getElementById('lt-goal').value;
+                const level = parseInt(document.getElementById('lt-level').value);
+                
+                // Time goal inputs
+                const h = parseInt(document.getElementById('lt-h').value) || 0;
+                const m = parseInt(document.getElementById('lt-m').value) || 0;
+                const s = parseInt(document.getElementById('lt-s').value) || 0;
+                let timeGoal = null;
+                if(h > 0 || m > 0 || s > 0) timeGoal = { hours: h, minutes: m, seconds: s };
+
+                if(!dateVal) return alert(dictionary[this.lang].error_past_date);
+                
+                this.toggleLoader(true);
+                
+                setTimeout(() => {
+                    const target = new Date(dateVal);
+                    // CALL ORIGINAL LOGIC
+                    const plan = generateLongTermPlan(goal, level, target, timeGoal, this.lang);
+
+                    if(!plan) {
+                        this.toggleLoader(false);
+                        return; // Logic function already alerted
+                    }
+
+                    const t = dictionary[this.lang];
+                    let html = `<h2 class="text-3xl font-bold text-brand-400 mb-8 tracking-tight text-center">${t.your_training_plan}</h2>`;
+                    html += `<div class="grid gap-6">`;
+
+                    // RENDER LOOP
+                    plan.forEach(week => {
+                         let color = "border-blue-500";
+                         let bg = "bg-blue-500/5";
+                         if(week.phase === t.build) { color = "border-green-500"; bg = "bg-green-500/5"; }
+                         if(week.phase === t.peak) { color = "border-red-500"; bg = "bg-red-500/5"; }
+                         if(week.phase === t.taper) { color = "border-brand-500"; bg = "bg-brand-500/5"; }
+
+                        html += `
+                            <div class="bg-slate-800/40 p-6 rounded-2xl border-l-4 ${color} hover:bg-slate-800/80 transition-colors shadow-lg border-t border-r border-b border-t-white/5 border-r-white/5 border-b-white/5">
+                                <div class="flex justify-between items-center mb-4 border-b border-slate-700/50 pb-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-900 px-2 py-1 rounded border border-slate-700">${t.week} ${week.week}</span>
+                                        <h3 class="text-lg font-bold text-white">${week.phase}</h3>
+                                    </div>
+                                </div>
+                                <ul class="space-y-3 text-sm text-slate-300">
+                        `;
+                        
+                        // Order days correctly
+                        const orderedDays = [t.days_short[1], t.days_short[2], t.days_short[3], t.days_short[4], t.days_short[5], t.days_short[6], t.days_short[0]];
+                        
+                        orderedDays.forEach(day => {
+                             const workout = week.workouts[day] || t.rest_day;
+                             html += `<li class="flex gap-4 items-baseline"><strong class="w-8 text-slate-500 shrink-0 text-right uppercase text-xs">${day}</strong> <span class="leading-relaxed">${workout}</span></li>`;
+                        });
+
+                        html += `</ul></div>`;
+                    });
+                    html += `</div>`;
+
+                    document.getElementById('result-container').innerHTML = html;
+                    this.toggleLoader(false);
+                    this.navigate('view-result');
+                }, 1500);
+            },
+
+            downloadPDF: async function() {
+                const el = document.getElementById('result-container');
+                const { jsPDF } = window.jspdf;
+                
+                // Style swap for PDF readability
+                const originalClass = el.className;
+                el.className = "bg-white text-slate-900 p-8"; 
+                
+                const textNodes = el.querySelectorAll('*');
+                const originalColors = [];
+                textNodes.forEach((node, i) => {
+                    originalColors[i] = node.style.color; 
+                    node.style.color = '#0f172a'; // Slate 900
+                    if(node.classList.contains('text-white')) node.classList.remove('text-white');
+                    if(node.classList.contains('text-slate-300')) node.classList.remove('text-slate-300');
+                    if(node.classList.contains('text-slate-400')) node.classList.remove('text-slate-400');
+                });
+
+                try {
+                    const canvas = await html2canvas(el, { scale: 2 });
+                    const img = canvas.toDataURL('image/png');
+                    const pdf = new jsPDF();
+                    const width = pdf.internal.pageSize.getWidth();
+                    const height = (canvas.height * width) / canvas.width;
+                    
+                    pdf.addImage(img, 'PNG', 0, 0, width, height);
+                    pdf.save('EntrenaAI_Plan.pdf');
+                } catch(e) {
+                    alert("Error generando PDF");
+                }
+
+                // Restore Styles
+                el.className = originalClass;
+                 textNodes.forEach((node, i) => {
+                    node.style.color = originalColors[i];
+                    this.navigate('view-result'); 
+                });
+            },
+
+            toggleLoader: function(show) {
+                const l = document.getElementById('loader');
+                if(show) l.classList.remove('hidden');
+                else l.classList.add('hidden');
+            }
+        };
+
+        // Init
+        App.init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrena.ai - Entrenador Personal IA para Running y Triatlón</title>
+    <meta name="description" content="Genera planes de entrenamiento personalizados y gratuitos con Inteligencia Artificial para maratón, media maratón, 10k y triatlón.">
+    <meta name="theme-color" content="#0f172a">
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configuración de Tailwind personalizada -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            400: '#fbbf24', // Amber 400
+                            500: '#f59e0b', // Amber 500
+                            600: '#d97706', // Amber 600
+                        },
+                        dark: {
+                            bg: '#020617', // Slate 950 dark
+                            surface: '#0f172a', // Slate 900
+                            border: '#1e293b', // Slate 800
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Cal Sans', 'Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Fuentes: Inter para cuerpo, Space Grotesk para títulos técnicos -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.03em; }
+        
+        /* Glassmorphism Utilities */
+        .glass {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .glass-card {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(245, 158, 11, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -15px rgba(245, 158, 11, 0.1);
+        }
+
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(to right, #fbbf24, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Utility for fade animations */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-dark-bg text-slate-300 antialiased selection:bg-brand-500 selection:text-white flex flex-col min-h-screen overflow-x-hidden">
+
+    <!-- Background Glow Effects -->
+    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 -left-4 w-96 h-96 bg-brand-500/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
+        <div class="absolute top-0 -right-4 w-96 h-96 bg-blue-600/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-20 w-96 h-96 bg-purple-600/10 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-4000"></div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
+        <div class="glass border-b border-white/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-20 items-center">
+                    <!-- Logo -->
+                    <a href="index.html" class="flex items-center gap-3 group relative z-10">
+                        <div class="relative">
+                            <div class="absolute inset-0 bg-brand-500 blur opacity-40 group-hover:opacity-70 transition-opacity duration-300"></div>
+                            <div class="relative bg-gradient-to-br from-brand-400 to-brand-600 p-2 rounded-xl text-dark-bg shadow-lg">
+                                <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+                            </div>
+                        </div>
+                        <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-400 transition-colors">entrena.ai</span>
+                    </a>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center gap-1">
+                        <a href="index.html" class="px-4 py-2 text-sm font-medium text-white rounded-lg bg-white/5 backdrop-blur-sm border border-white/10" data-i18n="nav_home">Inicio</a>
+                        <a href="app.html" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_app">App</a>
+                        <a href="como-funciona.html" class="px-4 py-2 text-sm font-medium text-slate-400 hover:text-white transition-colors" data-i18n="nav_how">Cómo funciona</a>
+                        
+                        <div class="h-6 w-px bg-slate-800 mx-2"></div>
+
+                        <!-- Language Selector -->
+                        <div class="relative group">
+                            <select id="lang-selector" class="appearance-none bg-transparent text-sm font-medium text-slate-400 hover:text-white cursor-pointer py-2 pr-6 pl-2 outline-none focus:text-brand-400">
+                                <option value="es" class="bg-dark-surface">ES</option>
+                                <option value="en" class="bg-dark-surface">EN</option>
+                                <option value="fr" class="bg-dark-surface">FR</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                        </div>
+
+                        <a href="app.html" class="ml-6 group relative px-6 py-2.5 rounded-full bg-brand-500 text-dark-bg font-bold text-sm overflow-hidden transition-transform hover:scale-105 active:scale-95" data-i18n="btn_start">
+                            <div class="absolute inset-0 bg-white/20 group-hover:translate-x-full transition-transform duration-500 ease-out -translate-x-full skew-x-12"></div>
+                            <span class="relative flex items-center gap-2">
+                                Empezar Gratis <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Mobile Button -->
+                    <button id="mobile-menu-btn" class="md:hidden relative z-10 p-2 text-slate-300 hover:text-white focus:outline-none">
+                        <i data-lucide="menu" class="w-7 h-7"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 z-0 bg-dark-bg/95 backdrop-blur-xl transform translate-x-full transition-transform duration-300 md:hidden flex flex-col justify-center items-center space-y-8">
+            <a href="index.html" class="text-2xl font-bold text-white" onclick="toggleMenu()">Inicio</a>
+            <a href="app.html" class="text-2xl font-bold text-slate-400" onclick="toggleMenu()">App</a>
+            <a href="como-funciona.html" class="text-2xl font-bold text-slate-400" onclick="toggleMenu()">Cómo funciona</a>
+            <a href="app.html" class="bg-brand-500 text-dark-bg px-8 py-3 rounded-full font-bold text-xl" onclick="toggleMenu()">Empezar Ahora</a>
+            <button id="close-menu" class="absolute top-6 right-6 text-slate-400 p-2">
+                <i data-lucide="x" class="w-8 h-8"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <main class="flex-grow relative z-10">
+        <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                
+                <!-- Badge -->
+                <div class="reveal active inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-900/20 border border-blue-500/30 text-blue-300 text-xs font-medium uppercase tracking-wider mb-8 hover:bg-blue-900/30 transition-colors cursor-default">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    <span data-i18n="hero_badge">IA v2.0 - Motor de Rendimiento Activo</span>
+                </div>
+
+                <!-- Hero Title -->
+                <h1 class="reveal text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-8 leading-[1.1]">
+                    <span data-i18n="hero_title_1">Tu Entrenador</span><br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-400 to-slate-600">Personal de</span>
+                    <span class="text-gradient block mt-2" data-i18n="hero_title_2">Running & Triatlón</span>
+                </h1>
+
+                <p class="reveal mt-6 text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed" data-i18n="hero_subtitle">
+                    Genera planes adaptativos al instante. Algoritmos avanzados que ajustan tu carga, volumen e intensidad en tiempo real. <span class="text-slate-200 font-medium">Sin registros. Sin pagos.</span>
+                </p>
+
+                <!-- CTA Group -->
+                <div class="reveal flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="app.html" class="w-full sm:w-auto px-8 py-4 bg-brand-500 hover:bg-brand-400 text-dark-bg text-lg font-bold rounded-xl shadow-[0_0_40px_-10px_rgba(245,158,11,0.3)] transition-all transform hover:-translate-y-1 hover:shadow-[0_0_60px_-15px_rgba(245,158,11,0.5)] flex items-center justify-center gap-2" data-i18n="cta_primary">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i> Crear mi Plan
+                    </a>
+                    <a href="como-funciona.html" class="w-full sm:w-auto px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-white border border-slate-700 hover:border-slate-600 text-lg font-semibold rounded-xl transition-all backdrop-blur-md flex items-center justify-center gap-2" data-i18n="cta_secondary">
+                        <i data-lucide="activity" class="w-5 h-5 text-slate-400"></i> Ver Demo
+                    </a>
+                </div>
+
+                <!-- Social Proof / Trust (New) -->
+                <div class="reveal mt-16 pt-8 border-t border-slate-800/50 flex flex-col md:flex-row items-center justify-center gap-8 text-slate-500 text-sm font-medium">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i> 100% Basado en Ciencia
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-brand-500"></i> Privacidad Total (Local Storage)
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="zap" class="w-4 h-4 text-blue-500"></i> Generación Instantánea
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section (Bento Grid Layout) -->
+        <section class="py-24 bg-dark-bg relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">Entrena Inteligente, <span class="text-slate-500">No Duro</span></h2>
+                    <p class="text-slate-400">Nuestra tecnología reemplaza las hojas de cálculo estáticas por planes dinámicos.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Feature 1: Main (Span 2 cols) -->
+                    <div class="md:col-span-2 glass-card p-8 rounded-3xl relative overflow-hidden group reveal">
+                        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <i data-lucide="trending-up" class="w-48 h-48 text-brand-500"></i>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="w-12 h-12 bg-brand-500/20 border border-brand-500/30 rounded-xl flex items-center justify-center text-brand-400 mb-6">
+                                <i data-lucide="cpu" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white mb-3" data-i18n="feat_1_title">Periodización Algorítmica</h3>
+                            <p class="text-slate-400 text-lg max-w-md" data-i18n="feat_1_desc">Desde 5K hasta Ironman. La IA calcula tu Tapering, fases de carga y semanas de recuperación automáticamente basándose en tu fecha de carrera.</p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="glass-card p-8 rounded-3xl reveal delay-100">
+                        <div class="w-12 h-12 bg-blue-500/20 border border-blue-500/30 rounded-xl flex items-center justify-center text-blue-400 mb-6">
+                            <i data-lucide="calendar-clock" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3" data-i18n="feat_2_title">Sesiones Diarias</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="feat_2_desc">¿Solo quieres entrenar hoy? Genera una sesión única ("Daily Workout") basada en tu fatiga actual y tiempo disponible.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="glass-card p-8 rounded-3xl reveal delay-200">
+                        <div class="w-12 h-12 bg-green-500/20 border border-green-500/30 rounded-xl flex items-center justify-center text-green-400 mb-6">
+                            <i data-lucide="lock" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3" data-i18n="feat_3_title">Client-Side First</h3>
+                        <p class="text-slate-400 text-sm" data-i18n="feat_3_desc">Tus datos nunca salen de tu dispositivo. Toda la lógica de cálculo se ejecuta en tu navegador. 100% Privado.</p>
+                    </div>
+
+                    <!-- Feature 4 (New small visual) -->
+                    <div class="md:col-span-3 glass-card p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-8 reveal">
+                        <div class="max-w-xl">
+                            <h3 class="text-xl font-bold text-white mb-2">Exportación PDF Profesional</h3>
+                            <p class="text-slate-400 text-sm">Descarga tu plan completo visualizado en un calendario limpio, listo para imprimir o guardar en tu móvil.</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                                <i data-lucide="file-text" class="w-6 h-6 text-slate-300"></i>
+                            </div>
+                            <div class="bg-slate-800 p-3 rounded-lg border border-slate-700">
+                                <i data-lucide="download" class="w-6 h-6 text-slate-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section (Accordion Style) -->
+        <section class="py-20 relative">
+            <div class="max-w-3xl mx-auto px-4 relative z-10">
+                <div class="text-center mb-12 reveal">
+                    <h2 class="text-3xl font-bold text-white" data-i18n="faq_title">Preguntas Frecuentes</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="reveal glass rounded-2xl overflow-hidden">
+                        <details class="group">
+                            <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-white list-none hover:bg-white/5 transition-colors">
+                                <span data-i18n="faq_1_q">¿Es realmente gratis?</span>
+                                <span class="transition-transform duration-300 group-open:rotate-180 bg-slate-800 p-1 rounded-full">
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                                </span>
+                            </summary>
+                            <div class="px-6 pb-6 pt-0 text-slate-400 leading-relaxed border-t border-slate-800/50 mt-2">
+                                <p class="pt-4" data-i18n="faq_1_a">Sí, 100%. Entrena.ai es un proyecto personal Open Source. No hay "Paywalls", suscripciones ocultas ni venta de datos.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="reveal glass rounded-2xl overflow-hidden">
+                        <details class="group">
+                            <summary class="flex justify-between items-center cursor-pointer p-6 font-medium text-lg text-white list-none hover:bg-white/5 transition-colors">
+                                <span data-i18n="faq_2_q">¿Sirve para principiantes?</span>
+                                <span class="transition-transform duration-300 group-open:rotate-180 bg-slate-800 p-1 rounded-full">
+                                    <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                                </span>
+                            </summary>
+                            <div class="px-6 pb-6 pt-0 text-slate-400 leading-relaxed border-t border-slate-800/50 mt-2">
+                                <p class="pt-4" data-i18n="faq_2_a">Absolutamente. Al configurar tu plan, selecciona el nivel "Iniciación". La IA reducirá el volumen y la intensidad para asegurar una progresión segura y evitar lesiones.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark-bg border-t border-slate-800 relative overflow-hidden">
+        <!-- Decorative Top Gradient -->
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent"></div>
+
+        <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-br from-brand-500 to-orange-600 p-2 rounded-lg shadow-lg shadow-brand-500/20">
+                        <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold text-white tracking-tight">entrena<span class="text-brand-500">.ai</span></span>
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-8 text-sm font-medium text-slate-400">
+                    <a href="app.html" class="hover:text-brand-400 transition-colors">App</a>
+                    <a href="como-funciona.html" class="hover:text-brand-400 transition-colors">Cómo Funciona</a>
+                    <a href="#" class="hover:text-brand-400 transition-colors">Privacidad</a>
+                    <a href="#" class="hover:text-brand-400 transition-colors">Github</a>
+                </div>
+
+                <p class="text-slate-600 text-sm font-medium">
+                    © 2025 Entrena.ai <span class="mx-2">|</span> Hecho con <span class="text-red-500 animate-pulse">❤</span> por runners.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Scroll Animation Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Mobile Menu Logic
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navbar = document.getElementById('navbar');
+
+        function toggleMenu() {
+            const isHidden = mobileMenu.classList.contains('translate-x-full');
+            if (isHidden) {
+                mobileMenu.classList.remove('translate-x-full');
+            } else {
+                mobileMenu.classList.add('translate-x-full');
+            }
+        }
+
+        menuBtn.addEventListener('click', toggleMenu);
+        closeMenuBtn.addEventListener('click', toggleMenu);
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-0');
+            } else {
+                navbar.classList.remove('py-0');
+            }
+        });
+
+        // Translations
+        const translations = {
+            es: {
+                nav_home: "Inicio", nav_app: "App", nav_how: "Cómo funciona", btn_start: "Empezar Gratis",
+                hero_badge: "IA v2.0 - Motor de Rendimiento Activo", 
+                hero_title_1: "Tu Entrenador", hero_title_2: "Running & Triatlón",
+                hero_subtitle: "Genera planes adaptativos al instante. Algoritmos avanzados que ajustan tu carga, volumen e intensidad en tiempo real. Sin registros.",
+                cta_primary: "Crear mi Plan", cta_secondary: "Ver Demo",
+                feat_1_title: "Periodización Algorítmica", feat_1_desc: "Desde 5K hasta Ironman. La IA calcula tu Tapering, fases de carga y semanas de recuperación.",
+                feat_2_title: "Sesiones Diarias", feat_2_desc: "¿Solo quieres entrenar hoy? Genera una sesión basada en tu fatiga.",
+                feat_3_title: "Client-Side First", feat_3_desc: "100% Privado. Tus datos nunca salen de tu navegador.",
+                faq_title: "Preguntas Frecuentes",
+                faq_1_q: "¿Es realmente gratis?", faq_1_a: "Sí, 100%. Entrena.ai es un proyecto Open Source.",
+                faq_2_q: "¿Sirve para principiantes?", faq_2_a: "Absolutamente. Selecciona nivel 'Iniciación' para evitar lesiones.",
+            },
+            en: {
+                nav_home: "Home", nav_app: "App", nav_how: "How it works", btn_start: "Start Free",
+                hero_badge: "AI v2.0 - Active Performance Engine", 
+                hero_title_1: "Your Personal", hero_title_2: "Running & Triathlon Coach",
+                hero_subtitle: "Adaptive plans generated instantly. Advanced algorithms adjust load, volume, and intensity in real-time. No sign-ups.",
+                cta_primary: "Create Plan", cta_secondary: "View Demo",
+                feat_1_title: "Algorithmic Periodization", feat_1_desc: "From 5K to Ironman. AI calculates Tapering, loading phases, and recovery weeks.",
+                feat_2_title: "Daily Workouts", feat_2_desc: "Just today? Get a session based on your current fatigue.",
+                feat_3_title: "Client-Side First", feat_3_desc: "100% Private. Your data never leaves your browser.",
+                faq_title: "FAQ",
+                faq_1_q: "Is it really free?", faq_1_a: "Yes, 100%. Entrena.ai is an Open Source project.",
+                faq_2_q: "Good for beginners?", faq_2_a: "Absolutely. Select 'Beginner' level to ensure safe progression.",
+            },
+            fr: {
+                nav_home: "Accueil", nav_app: "App", nav_how: "Fonctionnement", btn_start: "Commencer",
+                hero_badge: "IA v2.0 - Moteur de Performance", 
+                hero_title_1: "Votre Coach", hero_title_2: "Running & Triathlon",
+                hero_subtitle: "Plans adaptatifs générés instantanément. Algorithmes avancés ajustant charge et intensité. Pas d'inscription.",
+                cta_primary: "Créer mon Plan", cta_secondary: "Voir Demo",
+                feat_1_title: "Périodisation Algorithmique", feat_1_desc: "Du 5K à l'Ironman. L'IA calcule l'affûtage et les phases de charge.",
+                feat_2_title: "Entraînements quotidiens", feat_2_desc: "Juste aujourd'hui ? Session selon votre fatigue.",
+                feat_3_title: "Client-Side First", feat_3_desc: "100% Privé. Vos données restent dans le navigateur.",
+                faq_title: "FAQ",
+                faq_1_q: "Est-ce vraiment gratuit ?", faq_1_a: "Oui, 100%. Entrena.ai est un projet Open Source.",
+                faq_2_q: "Bon pour les débutants ?", faq_2_a: "Absolument. Sélectionnez le niveau 'Débutant'.",
+            }
+        };
+
+        // Language Logic
+        const langSelector = document.getElementById('lang-selector');
+        const savedLang = localStorage.getItem('entrena_lang') || 'es';
+        
+        langSelector.value = savedLang;
+        applyLanguage(savedLang);
+
+        langSelector.addEventListener('change', (e) => {
+            const lang = e.target.value;
+            localStorage.setItem('entrena_lang', lang);
+            applyLanguage(lang);
+        });
+
+        function applyLanguage(lang) {
+            const t = translations[lang];
+            // Update Text
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (t[key]) el.textContent = t[key];
+            });
+            
+            // Re-render Lucide icons in case DOM changed (rare but safe)
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto y Legal - Entrena.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-slate-900 text-slate-50">
+
+    <nav class="border-b border-slate-800 bg-slate-950 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-2xl text-white">entrena<span class="text-amber-400">.ai</span></a>
+            <a href="index.html" class="text-slate-400 hover:text-white text-sm">Volver</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-12">
+        
+        <div class="grid md:grid-cols-2 gap-12 mb-20">
+            <!-- Contact Form -->
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-6">Soporte</h1>
+                <p class="text-slate-400 mb-6">¿Tienes dudas sobre tu plan? Escríbenos.</p>
+                
+                <form onsubmit="event.preventDefault(); window.location.href='mailto:soporte@entrena.ai?subject=Consulta Web';">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Email</label>
+                            <input type="email" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-slate-400 mb-1">Mensaje</label>
+                            <textarea rows="4" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white"></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded font-medium w-full">
+                            Enviar Email
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FAQ Mini -->
+            <div class="bg-slate-800/50 p-8 rounded-2xl">
+                <h3 class="font-bold text-white mb-4">Dudas rápidas</h3>
+                <ul class="space-y-4 text-sm text-slate-400">
+                    <li>
+                        <strong class="text-slate-200 block">¿Guardan mis datos?</strong>
+                        No. Todo se ejecuta en tu navegador. Al cerrar la pestaña, los datos desaparecen.
+                    </li>
+                    <li>
+                        <strong class="text-slate-200 block">¿El PDF no se descarga?</strong>
+                        Asegúrate de no usar bloqueadores de scripts agresivos.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="border-slate-800 mb-12">
+
+        <!-- Legal Text -->
+        <section id="legal" class="prose prose-invert prose-sm max-w-none text-slate-400">
+            <h2 class="text-white">Aviso Legal y Privacidad</h2>
+            <p>Última actualización: 2025</p>
+
+            <h3>1. Responsabilidad</h3>
+            <p><strong>Entrena.ai</strong> es una herramienta de generación automática de planes. Los resultados son sugerencias basadas en algoritmos estándar. Esta herramienta <strong>no sustituye</strong> el consejo de un médico o un entrenador profesional titulado.</p>
+            <p>El uso de los planes generados es bajo tu propia responsabilidad. Consulta siempre a un médico antes de iniciar actividad física intensa.</p>
+
+            <h3>2. Privacidad y Cookies</h3>
+            <p>Este sitio web funciona mayoritariamente del lado del cliente (Client-Side). No almacenamos tus datos de salud, peso o planes en ninguna base de datos centralizada.</p>
+            <ul>
+                <li>Usamos <code>localStorage</code> para guardar tu preferencia de idioma.</li>
+                <li>No vendemos datos a terceros.</li>
+            </ul>
+
+            <h3>3. Propiedad Intelectual</h3>
+            <p>El código fuente, diseño y algoritmos de Entrena.ai son propiedad de sus creadores. Queda prohibida la reproducción total sin permiso.</p>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-950 py-8 text-center text-slate-600 text-sm border-t border-slate-800">
+        © 2025 Entrena.ai
+    </footer>
+</body>
+</html>
